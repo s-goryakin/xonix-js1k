@@ -18,6 +18,7 @@ o = {
 };
 
 area (surface) description:
+0 - outer space :)
 1 - land
 2 - sea
 3 - sand // user moves over the sea
@@ -33,8 +34,8 @@ function startLevel(level)
 		t:0,
 		m:"@",
 		v:0,
-		x:250,
-		y:280
+		x:25,
+		y:28
 	};
 	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level);
@@ -67,12 +68,55 @@ function getAreaType(x,y)
 	// check current matrix here
 }
 
+// check if area is the same type with specified one
+// return 1 is they are equal and -1 if not
+function verifyAreaType(x,y,type)
+{
+	return (getAreaType(x,y) == type ? 1 : -1);
+}
 
 function moveObject(o)
 {
 	
+	if (o.t) // not user
+		moveEnemy(o);
+	else
+		moveUser(o);
 	
-	
+}
+
+function moveUser(o)
+{
+	// process moving user here
+
+	// check outer space
+	// check passing land-sea or sea-land border
+}
+
+function moveEnemy(o)
+{
+	var k; // new coordinates
+	if (o.v -7 < 0) // vector is 5 or 6
+	{
+		k = -1;
+	}
+	else // vector is 7 or 8
+	{
+		k = 1;
+	}
+	n.y = o.y + verifyAreaType(o.x, o.y + k, o.t);
+
+	if ((o.v-6)*(o.v-7)) // vector is 5 or 8
+	{
+		k = -1;
+	}
+	else // vector is 6 or 7
+	{
+		k = 1;
+	}
+	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t);
+
+	changeObjectPosition(o.m, o.x, o.y, n.x, n.y);
 }
 
 
@@ -82,12 +126,13 @@ function getRandCoords(type)
 	if (type==1)
 		return {x:0,y:0};
 	else
-		return {x:250,y:150};
+		return {x:25,y:15};
 }
 
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o, x1, y1, x2, y2)
 {
+	x1*=s; y1*=s; x2*=s; y2*=s;
 	// Delete old item first
 	a.fillStyle = "#fff";
 	// Less filling not fully deleting old text :(
@@ -114,12 +159,12 @@ w.onload = function(){
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
 		o[0].v=(36<kc && kc<41) ? kc-37 : o[0].v;
-		
+//		console.log(o[0].v);
 		
 		/// todo: move to moveObject() method
 		x1=o[0].x;y1=o[0].y;
 		kc=e.keyCode
-		changeObjectPosition(o[0].m,x1,y1,o[0].x+=s*((kc==39)-(kc==37)),o[0].y+=s*((kc==40)-(kc==38)));
+		changeObjectPosition(o[0].m,x1,y1,o[0].x+=1*((kc==39)-(kc==37)),o[0].y+=1*((kc==40)-(kc==38)));
 		
 	});
 }
