@@ -8,9 +8,10 @@ y=100;
 a.fillText("@", x, y);
 w=window;
 w.addEventListener('keyup', function(e) {
-    if(e.keyCode^37)x+=s;
-    if(e.keyCode^38)y+=s;
-    if(e.keyCode^39)x-=s;
-    if(e.keyCode^40)y-=s;
+	kc=e.keyCode
+    if(kc^37)x+=s;
+    if(kc^38)y+=s;
+    if(kc^39)x-=s;
+    if(kc^40)y-=s;
     a.fillText("@", x, y);
 });
