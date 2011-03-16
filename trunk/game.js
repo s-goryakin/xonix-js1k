@@ -7,6 +7,8 @@ w=window;
 
 o = []; // game objects
 
+timer = "";
+
 //TODO: colors 
 // blue -- water -- 0033ff (03f)
 // gray -- land -- 999999 (999)
@@ -122,6 +124,7 @@ function moveUser(o)
 function moveEnemy(o)
 {
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
+	v = o.v-4; // v = [1..4]
 
 	var k;
 	var n = {};
@@ -190,6 +193,20 @@ function changeObjectPosition(o, x2, y2)
 	o.x=x2;o.y=y2;
 }
 
+function run()
+{
+	timer = setInterval(function(){
+		for(var a in o) {
+			moveObject(o[a]);
+		}
+	}, 50);
+}
+
+function stop()
+{
+	clearInterval(timer);
+}
+
 w.onload = function(){
 	startLevel(1);
 	w.addEventListener('keydown', function(e) {
@@ -201,12 +218,13 @@ w.onload = function(){
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
 		o[0].v=(36<kc && kc<41) ? kc-36 : o[0].v;
-		
+
+		if (kc == 32)
+			stop();
+		if (kc == 13)
+			run();
+
 	}, false);
 
-setInterval(function(){
-		for(var a in o) {
-			moveObject(o[a]);
-		}
-	}, 50);
+	run();
 }
