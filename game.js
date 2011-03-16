@@ -1,8 +1,9 @@
 wi=50;
 he=30;
 s=10;
-a.canvas.width=wi*s;
-a.canvas.height=he*s;
+c.width=wi*s;
+c.height=he*s;
+c.style.border = "red 1px solid";
 w=window;
 o = []; // game objects
 timer = "";
