@@ -1,8 +1,8 @@
-wi=490;
-he=290;
+wi=50;
+he=30;
 s=10;
-a.canvas.width=wi;
-a.canvas.height=he;
+a.canvas.width=wi*s;
+a.canvas.height=he*s;
 w=window;
 o = []; // game objects
 timer = "";
@@ -71,7 +71,7 @@ function getAreaType(x,y)
 
 	/// todo: add all other types
 	
-	if (x < 0 || y < 0 || x > 49 || y > 29)
+	if (x < 0 || y < 0 || x >= wi || y >= he)
 		return 0;
 	else
 		return 2;
@@ -97,7 +97,7 @@ function moveObject(o)
 
 function moveUser(o)
 {
-	console.log('vector: '+o.v);
+//	console.log('vector: '+o.v);
 	// process moving user here
 
 	// check outer space
@@ -106,9 +106,15 @@ function moveUser(o)
 	{
 		x=!((o.v-1)*(o.v-3))?o.v-2:0;
 		y=!((o.v-2)*(o.v-4))?o.v-3:0;
-		console.log(o.x,o.y,wi/s,he/s);
-		((o.x+x<1)||(o.x+x>=wi/s-1))?(o.v=0):0;
-		changeObjectPosition(o, o.x+x, o.y+y);
+//		console.log(o.x,o.y,wi,he);
+
+		if (getAreaType(o.x+x, o.y+y) != 0)
+			changeObjectPosition(o, o.x+x, o.y+y);
+		else
+			o.v=0;
+		
+//		((o.x+x<1)||(o.x+x>=wi/s-1))?(o.v=0):0;
+//		changeObjectPosition(o, o.x+x, o.y+y);
 	}
 }
 
@@ -188,16 +194,18 @@ function changeObjectPosition(o, x2, y2)
 
 function run()
 {
-	timer = setInterval(function(){
-		for(var a in o) {
-			moveObject(o[a]);
-		}
-	}, 50);
+	if (!timer)
+		timer = setInterval(function(){
+			for(var a in o) {
+				moveObject(o[a]);
+			}
+		}, 50);
 }
 
 function stop()
 {
 	clearInterval(timer);
+	timer = false;
 }
 
 function logObject(o, log_walls)
