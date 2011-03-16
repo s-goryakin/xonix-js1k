@@ -120,7 +120,6 @@ function moveUser(o)
 function moveEnemy(o)
 {
 //	logObject(o, 1);
-
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
 	var k;
 	var n = {};
@@ -174,7 +173,7 @@ function changeObjectPosition(o, x2, y2)
 {
 	// Delete old item first
 	//console.log(m[o.y][o.x]);
-	a.fillStyle = ((m[o.x][o.y]==1)?"#999":"#03f");
+	a.fillStyle=((!o.t&&m[o.x][o.y]==2)?"#ff0":((m[o.x][o.y]==1)?"#999":"#03f"));
 	//a.clearRect(o.x*s, o.y*s, s, s);
 	a.fillRect(o.x*s, o.y*s, s, s);
 
