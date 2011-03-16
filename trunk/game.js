@@ -165,9 +165,8 @@ w.onload = function(){
 //		console.log(o[0].v);
 		
 		/// todo: move to moveObject() method
-//		x1=o[0].x;y1=o[0].y;
-//		kc=e.keyCode
-//		changeObjectPosition(o[0].m,x1,y1,o[0].x+=1*((kc==39)-(kc==37)),o[0].y+=1*((kc==40)-(kc==38)));
+		kc=e.keyCode
+		changeObjectPosition(o[0],o[0].x+1*((kc==39)-(kc==37)),o[0].y+1*((kc==40)-(kc==38)));
 		
 	}, false);
 
