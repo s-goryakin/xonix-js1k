@@ -248,7 +248,9 @@ w.onload = function(){
 		kc=e.keyCode
 		if (36<kc && kc<41)
 		{
+			/// todo: decide if we really need the ability to stop
 			o[0].v = (o[0].v && Math.abs(kc-36-o[0].v)%4)==2 ? 0 : kc-36;
+//			o[0].v = kc-36;
 		}
 
 		if (kc == 32)
