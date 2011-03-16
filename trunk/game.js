@@ -1,23 +1,18 @@
 wi=490;
 he=290;
 s=10;
-a.canvas.width = wi;
-a.canvas.height = he;
+a.canvas.width=wi;
+a.canvas.height=he;
 w=window;
-
 o = []; // game objects
-
 timer = "";
-
 //TODO: colors 
 // blue -- water -- 0033ff (03f)
 // gray -- land -- 999999 (999)
 // green -- player -- 339900 (390)
 // red -- AI -- ff0000 (f00)
 // yellow -- path  -- ffff00 (ff0)
-
 /*
-
 Object description:
 o = { 
 	t:type, // 0 - user, 1 - land, 2 - sea
@@ -27,16 +22,12 @@ o = {
 	x:x, // x-coordinate
 	y:y // y-coordinate
 };
-
 area (surface) description:
 0 - outer space :)
 1 - land
 2 - sea
 3 - sand // user moves over the sea
-
 */
-
-
 // process all routine for starting level
 function startLevel(level)
 {
@@ -117,6 +108,8 @@ function moveUser(o)
 	{
 		x=!((o.v-1)*(o.v-3))?o.v-2:0;
 		y=!((o.v-2)*(o.v-4))?o.v-3:0;
+		console.log(o.x,o.y,wi/s,he/s);
+		((o.x+x<1)||(o.x+x>=wi/s-1))?(o.v=0):0;
 		changeObjectPosition(o, o.x+x, o.y+y);
 	}
 }
