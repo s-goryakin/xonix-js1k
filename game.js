@@ -95,7 +95,8 @@ function moveUser(o)
 
 function moveEnemy(o)
 {
-	var k; // new coordinates
+	var k; // increment
+	var n; // new coordinates
 	if (o.v -7 < 0) // vector is 5 or 6
 	{
 		k = -1;
