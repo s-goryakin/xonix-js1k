@@ -40,7 +40,7 @@ function startLevel(level)
 	};
 	
 //	createObjects(1, (level>7?7:level)); // max land enemies count is 7
-	createObjects(2, level);
+	createObjects(2, level+2);
 	
 	for (i=0;i<o.length;i++)
 	{
@@ -57,7 +57,7 @@ function createObjects(type, count)
 		o.push({
 			t:type,
 			c:"#f00",
-			v:Math.floor(Math.random() * 3) + 5, // 5..8
+			v:Math.round(Math.random() * 3) + 5, // 5..8
 			x:coords.x,
 			y:coords.y
 		});
@@ -97,7 +97,6 @@ function moveObject(o)
 
 function moveUser(o)
 {
-//	console.log('vector: '+o.v);
 	// process moving user here
 
 	// check outer space
@@ -106,7 +105,6 @@ function moveUser(o)
 	{
 		x=!((o.v-1)*(o.v-3))?o.v-2:0;
 		y=!((o.v-2)*(o.v-4))?o.v-3:0;
-//		console.log(o.x,o.y,wi,he);
 
 		if (getAreaType(o.x+x, o.y+y) != 0)
 			changeObjectPosition(o, o.x+x, o.y+y);
@@ -177,7 +175,7 @@ function getRandCoords(type)
 	if (type==1)
 		return {x:1,y:1};
 	else
-		return {x:25,y:15};
+		return {x:Math.round(Math.random() * wi),y:Math.round(Math.random() * he)};
 }
 
 // draw object at new coordinates and delete it from old coordinates
@@ -237,7 +235,7 @@ function logObject(o, log_walls)
 
 
 w.onload = function(){
-	startLevel(10);
+	startLevel(1);
 	w.addEventListener('keydown', function(e) {
 		
 		// we need to change vector or user object here
