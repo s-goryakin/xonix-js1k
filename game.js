@@ -42,8 +42,9 @@ function startLevel(level)
 	
 	for (i=0;i<o.length;i++)
 	{
-		changeObjectPosition(o[i].m, 0, 0, o[i].x, o[i].y);
+		changeObjectPosition(o[i], o[i].x, o[i].y);
 	}
+//	console.log(o);
 }
 
 // initialize game object and store it in the objects array
@@ -77,7 +78,6 @@ function verifyAreaType(x,y,type)
 
 function moveObject(o)
 {
-	
 	if (o.t) // not user
 		moveEnemy(o);
 	else
@@ -95,8 +95,8 @@ function moveUser(o)
 
 function moveEnemy(o)
 {
+//	console.log(o);
 	var k; // increment
-	var n; // new coordinates
 	if (o.v -7 < 0) // vector is 5 or 6
 	{
 		k = -1;
@@ -117,8 +117,8 @@ function moveEnemy(o)
 		k = 1;
 	}
 	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t);
-
-	changeObjectPosition(o.m, o.x, o.y, n.x, n.y);
+//	console.log(n);
+	changeObjectPosition(o, n.x, n.y);
 }
 
 
@@ -132,22 +132,23 @@ function getRandCoords(type)
 }
 
 // draw object at new coordinates and delete it from old coordinates
-function changeObjectPosition(o, x1, y1, x2, y2)
+function changeObjectPosition(o, x2, y2)
 {
-	x1*=s; y1*=s; x2*=s; y2*=s;
 	// Delete old item first
 	a.fillStyle = "#fff";
 	// Less filling not fully deleting old text :(
-	a.fillText(o, x1, y1);
-	a.fillText(o, x1, y1);
-	a.fillText(o, x1, y1);
-	a.fillText(o, x1, y1);
-	a.fillText(o, x1, y1);
-	a.fillText(o, x1, y1);
+	a.fillText(o.m, o.x*s, o.y*s);
+	a.fillText(o.m, o.x*s, o.y*s);
+	a.fillText(o.m, o.x*s, o.y*s);
+	a.fillText(o.m, o.x*s, o.y*s);
+	a.fillText(o.m, o.x*s, o.y*s);
+	a.fillText(o.m, o.x*s, o.y*s);
 
 	// Draw new item
 	a.fillStyle = "#000";
-    a.fillText(o, x2, y2);
+    a.fillText(o.m, x2*s, y2*s);
+
+	o.x=x2;o.y=y2;
 }
 
 w.onload = function(){
@@ -164,17 +165,18 @@ w.onload = function(){
 //		console.log(o[0].v);
 		
 		/// todo: move to moveObject() method
-		x1=o[0].x;y1=o[0].y;
-		kc=e.keyCode
-		changeObjectPosition(o[0].m,x1,y1,o[0].x+=1*((kc==39)-(kc==37)),o[0].y+=1*((kc==40)-(kc==38)));
+//		x1=o[0].x;y1=o[0].y;
+//		kc=e.keyCode
+//		changeObjectPosition(o[0].m,x1,y1,o[0].x+=1*((kc==39)-(kc==37)),o[0].y+=1*((kc==40)-(kc==38)));
 		
 	}, false);
-}
 
-setInterval(function(){
-	for(var a in o) {
-		if (o[a].t) {
+	setInterval(function(){
+		for(var a in o) {
 			moveObject(o[a]);
 		}
-	}
-}, 1000);
+	}, 250);
+}
+
+
+
