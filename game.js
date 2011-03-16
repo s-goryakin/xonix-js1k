@@ -5,8 +5,9 @@ c.width=wi*s;
 c.height=he*s;
 c.style.border = "red 1px solid";
 w=window;
-o = []; // game objects
+o=[]; // game objects
 timer = "";
+m=[];
 //TODO: colors 
 // blue -- water -- 0033ff (03f)
 // gray -- land -- 999999 (999)
@@ -35,7 +36,6 @@ function startLevel(level)
 	o[0] = { // user
 		t:0,
 		c:"#390",
-		v:0,
 		x:25,
 		y:28
 	};
@@ -173,7 +173,10 @@ function getRandCoords(type)
 function changeObjectPosition(o, x2, y2)
 {
 	// Delete old item first
-	a.clearRect(o.x*s, o.y*s, s, s);
+	//console.log(m[o.y][o.x]);
+	a.fillStyle = ((m[o.x][o.y]==1)?"#999":"#03f");
+	//a.clearRect(o.x*s, o.y*s, s, s);
+	a.fillRect(o.x*s, o.y*s, s, s);
 
 	// Draw new item
 	a.fillStyle = o.c;
@@ -225,8 +228,23 @@ function logObject(o, log_walls)
 	}
 }
 
+function generateMap() {
+	for(i=0;i<wi;i++) {
+		map=[];
+		for(j=0;j<he;j++) {
+			k=2;
+			if(j<2||j>he-3||i<2||i>wi-3) k=1;
+			map.push(k);
+			a.fillStyle=((k==1)?"#999":"#03f");
+			a.fillRect(i*s,j*s,s,s);
+		}
+		m.push(map);
+	}
+}
+
 
 w.onload = function(){
+	generateMap();
 	startLevel(1);
 	w.addEventListener('keydown', function(e) {
 		
