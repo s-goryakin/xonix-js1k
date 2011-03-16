@@ -173,7 +173,11 @@ function changeObjectPosition(o, x2, y2)
 {
 	// Delete old item first
 	//console.log(m[o.y][o.x]);
-	a.fillStyle=((!o.t&&m[o.x][o.y]==2)?"#ff0":((m[o.x][o.y]==1)?"#999":"#03f"));
+	if((!o.t&&m[o.x][o.y]==2)|| (m[o.x][o.y]==4)){
+		c="#ff0";
+		m[o.x][o.y]=4;
+	}else c=((m[o.x][o.y]==1)?"#999":"#03f");
+	a.fillStyle=c;
 	//a.clearRect(o.x*s, o.y*s, s, s);
 	a.fillRect(o.x*s, o.y*s, s, s);
 
