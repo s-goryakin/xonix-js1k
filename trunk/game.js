@@ -6,6 +6,14 @@ a.canvas.height = he;
 w=window;
 
 o = []; // game objects
+
+//TODO: colors 
+// blue -- water -- 0033ff (03f)
+// gray -- land -- 999999 (999)
+// green -- player -- 339900 (390)
+// red -- AI -- ff0000 (f00)
+// yellow -- path  -- ffff00 (ff0)
+
 /*
 
 Object description:
@@ -44,7 +52,6 @@ function startLevel(level)
 	{
 		changeObjectPosition(o[i], o[i].x, o[i].y);
 	}
-//	console.log(o);
 }
 
 // initialize game object and store it in the objects array
@@ -82,7 +89,6 @@ function getAreaType(x,y)
 // return 1 is they are equal and -1 if not
 function verifyAreaType(x,y,type)
 {
-//	console.log('x: '+x, 'y: '+y, 'type: '+getAreaType(x,y));
 	return (getAreaType(x,y) == type ? 1 : -1);
 }
 
@@ -97,19 +103,24 @@ function moveObject(o)
 
 function moveUser(o)
 {
+	if(o.v==1)o.x-=1;
+	if(o.v==2)o.y-=1;
+	if(o.v==3)o.x+=1;
+	if(o.v==4)o.y+=1;
 	// process moving user here
 
 	// check outer space
 	// check passing land-sea or sea-land border
+	
+	changeObjectPosition(o, o.x, o.y);
 }
 
 function moveEnemy(o)
 {
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
 
-//	console.log(o);
 	var k;
-	var n = {x:0,y:0};
+	var n = {};
 	if (o.v < 7) // vector is 5 or 6
 	{
 		k = -1;
@@ -124,16 +135,16 @@ function moveEnemy(o)
 	if ((o.v-6)*(o.v-7)) // vector is 5 or 8
 	{
 		k = -1;
-	}
-	else // vector is 6 or 7
-	{
+	} else {
 		k = 1;
 	}
+
 	invert_x = verifyAreaType(o.x + k, o.y, o.t) == -1;
 	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t) * k;
-
+	
 	changeEnemyVector(o, invert_x, invert_y);
 	changeObjectPosition(o, n.x, n.y);
+
 }
 
 function changeEnemyVector(o, invert_x, invert_y)
@@ -175,10 +186,9 @@ function changeObjectPosition(o, x2, y2)
 	a.fillText(o.m, o.x*s, o.y*s);
 	a.fillText(o.m, o.x*s, o.y*s);
 	a.fillText(o.m, o.x*s, o.y*s);
-
 	// Draw new item
 	a.fillStyle = "#000";
-    a.fillText(o.m, x2*s, y2*s);
+	a.fillText(o.m, x2*s, y2*s);
 
 	o.x=x2;o.y=y2;
 }
@@ -193,21 +203,17 @@ w.onload = function(){
 		
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
-		o[0].v=(36<kc && kc<41) ? kc-37 : o[0].v;
-//		console.log(o[0].v);
+		o[0].v=(36<kc && kc<41) ? kc-36 : o[0].v;
 		
 		/// todo: move to moveObject() method
 		kc=e.keyCode
-		changeObjectPosition(o[0],o[0].x+1*((kc==39)-(kc==37)),o[0].y+1*((kc==40)-(kc==38)));
+		//changeObjectPosition(o[0],o[0].x+1*((kc==39)-(kc==37)),o[0].y+1*((kc==40)-(kc==38)));
 		
 	}, false);
 
-	setInterval(function(){
+setInterval(function(){
 		for(var a in o) {
 			moveObject(o[a]);
 		}
 	}, 50);
 }
-
-
-
