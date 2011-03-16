@@ -166,5 +166,5 @@ w.onload = function(){
 		kc=e.keyCode
 		changeObjectPosition(o[0].m,x1,y1,o[0].x+=1*((kc==39)-(kc==37)),o[0].y+=1*((kc==40)-(kc==38)));
 		
-	});
+	}, false);
 }
