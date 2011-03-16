@@ -20,6 +20,7 @@ Object description:
 o = { 
 	t:type, // 0 - user, 1 - land, 2 - sea
 	m:mark, // @ - user, x - land, o - sea
+	c:color, // #390 - user, #f00 - AI
 	v:vector, // 0 - stop, 1 - left, 2 - up, 3 - right, 4 - down, 5 - left-up, 6 - up-right, 7 - right-down, 8 - down-left
 	x:x, // x-coordinate
 	y:y // y-coordinate
@@ -41,6 +42,7 @@ function startLevel(level)
 	o[0] = { // user
 		t:0,
 		m:"@",
+		c:"#390",
 		v:0,
 		x:25,
 		y:28
@@ -63,6 +65,7 @@ function createObjects(type, count)
 		o.push({
 			t:type,
 			m:(type==1)?"X":"O",
+			c:"#f00",
 			v:Math.floor(Math.random() * 3) + 5, // 5..8
 			x:coords.x,
 			y:coords.y
@@ -103,16 +106,17 @@ function moveObject(o)
 
 function moveUser(o)
 {
-	if(o.v==1)o.x-=1;
-	if(o.v==2)o.y-=1;
-	if(o.v==3)o.x+=1;
-	if(o.v==4)o.y+=1;
+	
 	// process moving user here
 
 	// check outer space
 	// check passing land-sea or sea-land border
-	
-	changeObjectPosition(o, o.x, o.y);
+	if (o.v)
+	{
+		x=!((o.v-1)*(o.v-3))?o.v-2:0;
+		y=!((o.v-2)*(o.v-4))?o.v-3:0;
+		changeObjectPosition(o, o.x+x, o.y+y);
+	}
 }
 
 function moveEnemy(o)
@@ -177,19 +181,12 @@ function getRandCoords(type)
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o, x2, y2)
 {
-	// Delete old item first
-	a.fillStyle = "#fff";
-	// Less filling not fully deleting old text :(
-	a.fillText(o.m, o.x*s, o.y*s);
-	a.fillText(o.m, o.x*s, o.y*s);
-	a.fillText(o.m, o.x*s, o.y*s);
-	a.fillText(o.m, o.x*s, o.y*s);
-	a.fillText(o.m, o.x*s, o.y*s);
-	a.fillText(o.m, o.x*s, o.y*s);
-	// Draw new item
-	a.fillStyle = "#000";
-	a.fillText(o.m, x2*s, y2*s);
+   // Delete old item first
+   a.clearRect(o.x*s, o.y*s, s, s);
 
+   // Draw new item
+   a.fillStyle = o.c;
+   a.fillRect(x2*s, y2*s, s, s);
 	o.x=x2;o.y=y2;
 }
 
@@ -204,10 +201,6 @@ w.onload = function(){
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
 		o[0].v=(36<kc && kc<41) ? kc-36 : o[0].v;
-		
-		/// todo: move to moveObject() method
-		kc=e.keyCode
-		//changeObjectPosition(o[0],o[0].x+1*((kc==39)-(kc==37)),o[0].y+1*((kc==40)-(kc==38)));
 		
 	}, false);
 
