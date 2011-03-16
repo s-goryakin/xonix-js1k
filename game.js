@@ -122,10 +122,9 @@ function moveEnemy(o)
 //	logObject(o, 1);
 
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
-	v = o.v-4; // v = [1..4]
-
 	var k;
 	var n = {};
+	var inv = {};
 	if (o.v < 7) // vector is 5 or 6
 	{
 		k = -1;
@@ -134,7 +133,7 @@ function moveEnemy(o)
 	{
 		k = 1;
 	}
-	invert_y = verifyAreaType(o.x, o.y + k, o.t) == -1;
+	inv.y = verifyAreaType(o.x, o.y + k, o.t) == -1;
 	n.y = o.y + verifyAreaType(o.x, o.y + k, o.t) * k;
 	
 	if ((o.v-6)*(o.v-7)) // vector is 5 or 8
@@ -144,29 +143,20 @@ function moveEnemy(o)
 		k = 1;
 	}
 
-	invert_x = verifyAreaType(o.x + k, o.y, o.t) == -1;
+	inv.x = verifyAreaType(o.x + k, o.y, o.t) == -1;
 	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t) * k;
 	
-	changeEnemyVector(o, invert_x, invert_y);
+	changeEnemyVector(o, inv);
 	changeObjectPosition(o, n.x, n.y);
 
 }
 
-function changeEnemyVector(o, invert_x, invert_y)
+function changeEnemyVector(o, inv)
 {
-	v = o.v;
-	if (invert_x)
-	{
-		if (o.v < 7)
-			o.v = 11 - o.v;
-		else
-			o.v = 15 - o.v;
-	}
-
-	if (invert_y)
-	{
+	if (inv.x)
+		o.v = 8 - (o.v+1)%4;
+	if (inv.y)
 		o.v = 13 - o.v;
-	}
 }
 
 
