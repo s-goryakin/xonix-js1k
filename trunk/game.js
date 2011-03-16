@@ -95,6 +95,8 @@ function moveUser(o)
 
 function moveEnemy(o)
 {
+	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
+
 //	console.log(o);
 	var k; // increment
 	if (o.v -7 < 0) // vector is 5 or 6
