@@ -37,7 +37,7 @@ function startLevel(level)
 		x:25,
 		y:28
 	};
-	createObjects(1, (level>7?7:level)); // max land enemies count is 7
+//	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level);
 	
 	for (i=0;i<o.length;i++)
@@ -67,12 +67,22 @@ function createObjects(type, count)
 function getAreaType(x,y)
 {
 	// check current matrix here
+
+	/// todo: add all other types
+	
+	if (x < 0 || y < 0 || x > 49 || y > 29)
+		return 0;
+	else
+		return 2;
+
+
 }
 
 // check if area is the same type with specified one
 // return 1 is they are equal and -1 if not
 function verifyAreaType(x,y,type)
 {
+//	console.log('x: '+x, 'y: '+y, 'type: '+getAreaType(x,y));
 	return (getAreaType(x,y) == type ? 1 : -1);
 }
 
@@ -98,8 +108,9 @@ function moveEnemy(o)
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
 
 //	console.log(o);
-	var k; // increment
-	if (o.v -7 < 0) // vector is 5 or 6
+	var k;
+	var n = {x:0,y:0};
+	if (o.v < 7) // vector is 5 or 6
 	{
 		k = -1;
 	}
@@ -107,9 +118,9 @@ function moveEnemy(o)
 	{
 		k = 1;
 	}
-	var n = {};
-	n.y = o.y + verifyAreaType(o.x, o.y + k, o.t);
-
+	invert_y = verifyAreaType(o.x, o.y + k, o.t) == -1;
+	n.y = o.y + verifyAreaType(o.x, o.y + k, o.t) * k;
+	
 	if ((o.v-6)*(o.v-7)) // vector is 5 or 8
 	{
 		k = -1;
@@ -118,9 +129,28 @@ function moveEnemy(o)
 	{
 		k = 1;
 	}
-	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t);
-//	console.log(n);
+	invert_x = verifyAreaType(o.x + k, o.y, o.t) == -1;
+	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t) * k;
+
+	changeEnemyVector(o, invert_x, invert_y);
 	changeObjectPosition(o, n.x, n.y);
+}
+
+function changeEnemyVector(o, invert_x, invert_y)
+{
+	v = o.v;
+	if (invert_x)
+	{
+		if (o.v < 7)
+			o.v = ((o.v - 5) * -1) + 6;
+		else
+			o.v = ((o.v - 7) * -1) + 8;
+	}
+
+	if (invert_y)
+	{
+		o.v = ((o.v+2))%4 + 5;
+	}
 }
 
 
@@ -128,7 +158,7 @@ function moveEnemy(o)
 function getRandCoords(type)
 {
 	if (type==1)
-		return {x:0,y:0};
+		return {x:1,y:1};
 	else
 		return {x:25,y:15};
 }
@@ -176,7 +206,7 @@ w.onload = function(){
 		for(var a in o) {
 			moveObject(o[a]);
 		}
-	}, 250);
+	}, 50);
 }
 
 
