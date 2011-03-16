@@ -3,10 +3,10 @@ he=30;
 s=10;
 c.width=wi*s;
 c.height=he*s;
-c.style.border = "red 1px solid";
+c.style.border="red 1px solid";
 w=window;
-o=[]; // game objects
-timer = "";
+o=[];
+timer="";
 m=[];
 //TODO: colors 
 // blue -- water -- 0033ff (03f)
@@ -66,8 +66,7 @@ function createObjects(type, count)
 }
 
 // return the type of surface for specified coordinates
-function getAreaType(x,y)
-{
+function getAreaType(x,y){
 	// check current matrix here
 
 	/// todo: add all other types
@@ -75,9 +74,7 @@ function getAreaType(x,y)
 	if (x < 0 || y < 0 || x >= wi || y >= he)
 		return 0;
 	else
-		return 2;
-
-
+		return m[x][y];
 }
 
 // check if area is the same type with specified one
@@ -107,8 +104,8 @@ function moveUser(o)
 		x=!((o.v-1)*(o.v-3))?o.v-2:0;
 		y=!((o.v-2)*(o.v-4))?o.v-3:0;
 
-		if (getAreaType(o.x+x, o.y+y) != 0)
-			changeObjectPosition(o, o.x+x, o.y+y);
+		if (getAreaType(o.x+x, o.y+y)!=0)
+			changeObjectPosition(o,o.x+x,o.y+y);
 		else
 			o.v=0;
 		
@@ -150,8 +147,7 @@ function moveEnemy(o)
 
 }
 
-function changeEnemyVector(o, inv)
-{
+function changeEnemyVector(o,inv){
 	if (inv.x)
 		o.v = 8 - (o.v+1)%4;
 	if (inv.y)
@@ -160,25 +156,15 @@ function changeEnemyVector(o, inv)
 
 
 // Used only for start level
-function getRandCoords(type)
-{
-	if (type==1)
-		return {x:1,y:1};
-	else
-		return {x:Math.round(Math.random() * wi),y:Math.round(Math.random() * he)};
+function getRandCoords(type){
+	return ((type==1)?{x:1,y:1}:{x:Math.round(Math.random()*wi),y:Math.round(Math.random()*he)});
 }
 
 // draw object at new coordinates and delete it from old coordinates
-function changeObjectPosition(o, x2, y2)
-{
+function changeObjectPosition(o,x2,y2){
 	// Delete old item first
-	//console.log(m[o.y][o.x]);
-	if((!o.t&&m[o.x][o.y]==2)|| (m[o.x][o.y]==4)){
-		c="#ff0";
-		m[o.x][o.y]=4;
-	}else c=((m[o.x][o.y]==1)?"#999":"#03f");
+	if((!o.t&&m[o.x][o.y]==2)||(m[o.x][o.y]==4)){c="#ff0";m[o.x][o.y]=4;}else c=((m[o.x][o.y]==1)?"#999":"#03f");
 	a.fillStyle=c;
-	//a.clearRect(o.x*s, o.y*s, s, s);
 	a.fillRect(o.x*s, o.y*s, s, s);
 
 	// Draw new item
@@ -187,25 +173,20 @@ function changeObjectPosition(o, x2, y2)
 	o.x=x2;o.y=y2;
 }
 
-function togglePause()
-{
-	if (!timer)
-	{
+function togglePause(){
+	if (!timer){
 		timer = setInterval(function(){
 			for(var a in o) {
 				moveObject(o[a]);
 			}
-		}, 50);
-	}
-	else
-	{
+		},50);
+	}else{
 		clearInterval(timer);
 		timer = "";
 	}
 }
 
-function logObject(o, log_walls)
-{
+function logObject(o,log_walls){
 	console.log(
 		'v: '+o.v,
 		'x: '+o.x,
