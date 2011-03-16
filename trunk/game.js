@@ -16,7 +16,6 @@ timer = "";
 Object description:
 o = { 
 	t:type, // 0 - user, 1 - land, 2 - sea
-	m:mark, // @ - user, x - land, o - sea
 	c:color, // #390 - user, #f00 - AI
 	v:vector, // 0 - stop, 1 - left, 2 - up, 3 - right, 4 - down, 5 - left-up, 6 - up-right, 7 - right-down, 8 - down-left
 	x:x, // x-coordinate
@@ -34,12 +33,12 @@ function startLevel(level)
 	
 	o[0] = { // user
 		t:0,
-		m:"@",
 		c:"#390",
 		v:0,
 		x:25,
 		y:28
 	};
+	
 //	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level);
 	
@@ -57,7 +56,6 @@ function createObjects(type, count)
 		coords = getRandCoords(type);
 		o.push({
 			t:type,
-			m:(type==1)?"X":"O",
 			c:"#f00",
 			v:Math.floor(Math.random() * 3) + 5, // 5..8
 			x:coords.x,
@@ -99,7 +97,7 @@ function moveObject(o)
 
 function moveUser(o)
 {
-	
+	console.log('vector: '+o.v);
 	// process moving user here
 
 	// check outer space
@@ -116,6 +114,8 @@ function moveUser(o)
 
 function moveEnemy(o)
 {
+//	logObject(o, 1);
+
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
 	v = o.v-4; // v = [1..4]
 
@@ -153,14 +153,14 @@ function changeEnemyVector(o, invert_x, invert_y)
 	if (invert_x)
 	{
 		if (o.v < 7)
-			o.v = ((o.v - 5) * -1) + 6;
+			o.v = 11 - o.v;
 		else
-			o.v = ((o.v - 7) * -1) + 8;
+			o.v = 15 - o.v;
 	}
 
 	if (invert_y)
 	{
-		o.v = ((o.v+2))%4 + 5;
+		o.v = 13 - o.v;
 	}
 }
 
@@ -177,12 +177,12 @@ function getRandCoords(type)
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o, x2, y2)
 {
-   // Delete old item first
-   a.clearRect(o.x*s, o.y*s, s, s);
+	// Delete old item first
+	a.clearRect(o.x*s, o.y*s, s, s);
 
-   // Draw new item
-   a.fillStyle = o.c;
-   a.fillRect(x2*s, y2*s, s, s);
+	// Draw new item
+	a.fillStyle = o.c;
+	a.fillRect(x2*s, y2*s, s, s);
 	o.x=x2;o.y=y2;
 }
 
@@ -200,8 +200,36 @@ function stop()
 	clearInterval(timer);
 }
 
+function logObject(o, log_walls)
+{
+	console.log(
+		'v: '+o.v,
+		'x: '+o.x,
+		'y: '+o.y
+	);
+	if (log_walls)
+	{
+		console.log(
+			getAreaType(o.x-1, o.y-1),
+			getAreaType(o.x-0, o.y-1),
+			getAreaType(o.x+1, o.y-1)
+		);
+		console.log(
+			getAreaType(o.x-1, o.y),
+			5,
+			getAreaType(o.x+1, o.y)
+		);
+		console.log(
+			getAreaType(o.x-1, o.y+1),
+			getAreaType(o.x-0, o.y+1),
+			getAreaType(o.x+1, o.y+1)
+		);
+	}
+}
+
+
 w.onload = function(){
-	startLevel(1);
+	startLevel(10);
 	w.addEventListener('keydown', function(e) {
 		
 		// we need to change vector or user object here
@@ -210,7 +238,10 @@ w.onload = function(){
 		
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
-		o[0].v=(36<kc && kc<41) ? kc-36 : o[0].v;
+		if (36<kc && kc<41)
+		{
+			o[0].v = (o[0].v && Math.abs(kc-36-o[0].v)%4)==2 ? 0 : kc-36;
+		}
 
 		if (kc == 32)
 			stop();
