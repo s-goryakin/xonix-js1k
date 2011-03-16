@@ -105,6 +105,7 @@ function moveEnemy(o)
 	{
 		k = 1;
 	}
+	var n = {};
 	n.y = o.y + verifyAreaType(o.x, o.y + k, o.t);
 
 	if ((o.v-6)*(o.v-7)) // vector is 5 or 8
@@ -169,3 +170,11 @@ w.onload = function(){
 		
 	}, false);
 }
+
+setInterval(function(){
+	for(var a in o) {
+		if (o[a].t) {
+			moveObject(o[a]);
+		}
+	}
+}, 1000);
