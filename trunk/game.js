@@ -181,20 +181,21 @@ function changeObjectPosition(o, x2, y2)
 	o.x=x2;o.y=y2;
 }
 
-function run()
+function togglePause()
 {
 	if (!timer)
+	{
 		timer = setInterval(function(){
 			for(var a in o) {
 				moveObject(o[a]);
 			}
 		}, 50);
-}
-
-function stop()
-{
-	clearInterval(timer);
-	timer = false;
+	}
+	else
+	{
+		clearInterval(timer);
+		timer = "";
+	}
 }
 
 function logObject(o, log_walls)
@@ -235,6 +236,7 @@ w.onload = function(){
 		
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
+//		console.log(kc);
 		if (36<kc && kc<41)
 		{
 			/// todo: decide if we really need the ability to stop
@@ -242,12 +244,10 @@ w.onload = function(){
 //			o[0].v = kc-36;
 		}
 
-		if (kc == 32)
-			stop();
-		if (kc == 13)
-			run();
+		if (kc == 80) // "P"
+			togglePause();
 
 	}, false);
 
-	run();
+	togglePause();
 }
