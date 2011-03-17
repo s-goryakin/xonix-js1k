@@ -28,6 +28,7 @@ area (surface) description:
 1 - land
 2 - sea
 3 - sand // user moves over the sea
+4 -- slice path
 */
 // process all routine for starting level
 function startLevel(level)
