@@ -103,25 +103,22 @@ function moveUser(o)
 	{
 		x=!((o.v-1)*(o.v-3))?o.v-2:0;
 		y=!((o.v-2)*(o.v-4))?o.v-3:0;
-
 		if (getAreaType(o.x+x, o.y+y)!=0)
 			changeObjectPosition(o,o.x+x,o.y+y);
 		else
 			o.v=0;
-		
-//		((o.x+x<1)||(o.x+x>=wi/s-1))?(o.v=0):0;
-//		changeObjectPosition(o, o.x+x, o.y+y);
 	}
 }
 
-function moveEnemy(o)
+function moveEnemy(t)
 {
+	if (t.x==o[0].x&&t.y==o[0].y)gameOver();
 //	logObject(o, 1);
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
-	var k;
-	var n = {};
-	var inv = {};
-	if (o.v < 7) // vector is 5 or 6
+	k;
+	n = {};
+	inv = {};
+	if (t.v < 7) // vector is 5 or 6
 	{
 		k = -1;
 	}
@@ -129,22 +126,21 @@ function moveEnemy(o)
 	{
 		k = 1;
 	}
-	inv.y = verifyAreaType(o.x, o.y + k, o.t) == -1;
-	n.y = o.y + verifyAreaType(o.x, o.y + k, o.t) * k;
+	inv.y = verifyAreaType(t.x, t.y + k, t.t) == -1;
+	n.y = t.y + verifyAreaType(t.x, t.y + k, t.t) * k;
 	
-	if ((o.v-6)*(o.v-7)) // vector is 5 or 8
+	if ((t.v-6)*(t.v-7)) // vector is 5 or 8
 	{
 		k = -1;
 	} else {
 		k = 1;
 	}
 
-	inv.x = verifyAreaType(o.x + k, o.y, o.t) == -1;
-	n.x = o.x + verifyAreaType(o.x + k, o.y, o.t) * k;
+	inv.x = verifyAreaType(t.x + k, t.y, t.t) == -1;
+	n.x = t.x + verifyAreaType(t.x + k, t.y, t.t) * k;
 	
-	changeEnemyVector(o, inv);
-	changeObjectPosition(o, n.x, n.y);
-
+	changeEnemyVector(t, inv);
+	changeObjectPosition(t, n.x, n.y);
 }
 
 function changeEnemyVector(o,inv){
@@ -218,17 +214,30 @@ function logObject(o,log_walls){
 }
 
 function generateMap() {
-	for(i=0;i<wi;i++) {
+	i=wi-1;
+	while(i>=0) {
 		map=[];
-		for(j=0;j<he;j++) {
+		j=he-1;
+		while(j>=0) {
 			k=2;
 			if(j<2||j>he-3||i<2||i>wi-3) k=1;
 			map.push(k);
 			a.fillStyle=((k==1)?"#999":"#03f");
 			a.fillRect(i*s,j*s,s,s);
+			j--;
 		}
 		m.push(map);
+		i--;
 	}
+}
+
+function gameOver() {
+	togglePause();
+	a.fillStyle="red";
+	a.fillRect(0,0,wi*s,he*s);
+	a.fillStyle="white";
+	a.font = "25px Arial";
+	a.fillText("You have died of dysentery", 80, (he/2*s));
 }
 
 
