@@ -1,5 +1,5 @@
-wi=50;
-he=30;
+wi=70;
+he=40;
 s=10;
 c.width=wi*s;
 c.height=he*s;
@@ -38,12 +38,12 @@ function startLevel(level)
 	u = { // user
 		t:0,
 		c:"#390",
-		x:25,
-		y:28
+		x:wi/2,
+		y:he-2
 	};
 	
 	createObjects(1, (level>7?7:level)); // max land enemies count is 7
-	createObjects(2, level+2);
+	createObjects(2, level+1);
 
 	changeObjectPosition(u, u.x, u.y)
 	for(var i in o) {
@@ -72,7 +72,6 @@ function getAreaType(x,y){
 	// check current matrix here
 
 	/// todo: add all other types
-	
 	if (x < 0 || y < 0 || x >= wi || y >= he)
 		return 0;
 	else
