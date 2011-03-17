@@ -28,7 +28,6 @@ area (surface) description:
 1 - land
 2 - sea
 3 - sand // user moves over the sea
-4 -- slice path
 */
 // process all routine for starting level
 function startLevel(level)
@@ -113,22 +112,20 @@ function moveUser(o)
 
 function moveEnemy(t)
 {
-	if (t.x==o[0].x&&t.y==o[0].y)gameOver();
 //	logObject(o, 1);
 	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
-	k;
 	n = {};
 	inv = {};
 	if (t.v < 7) // vector is 5 or 6
 	{
-		k = -1;
+		ky = -1;
 	}
 	else // vector is 7 or 8
 	{
-		k = 1;
+		ky = 1;
 	}
-	inv.y = verifyAreaType(t.x, t.y + k, t.t) == -1;
-	n.y = t.y + verifyAreaType(t.x, t.y + k, t.t) * k;
+	inv.y = verifyAreaType(t.x, t.y + ky, t.t) == -1;
+	n.y = t.y + verifyAreaType(t.x, t.y + ky, t.t) * ky;
 	
 	if ((t.v-6)*(t.v-7)) // vector is 5 or 8
 	{
@@ -139,6 +136,8 @@ function moveEnemy(t)
 
 	inv.x = verifyAreaType(t.x + k, t.y, t.t) == -1;
 	n.x = t.x + verifyAreaType(t.x + k, t.y, t.t) * k;
+	
+	if ((n.x==o[0].x&&n.y==o[0].y)||verifyAreaType(t.x + k, t.y+ky, 3)==1)gameOver();
 	
 	changeEnemyVector(t, inv);
 	changeObjectPosition(t, n.x, n.y);
@@ -165,7 +164,7 @@ function getRandCoords(type){
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o,x2,y2){
 	// Delete old item first
-	if((!o.t&&m[o.x][o.y]==2)||(m[o.x][o.y]==4)){c="#ff0";m[o.x][o.y]=4;}else c=((m[o.x][o.y]==1)?"#999":"#03f");
+	if((!o.t&&m[o.x][o.y]==2)||(m[o.x][o.y]==3)){c="#ff0";m[o.x][o.y]=3;}else c=((m[o.x][o.y]==1)?"#999":"#03f");
 	a.fillStyle=c;
 	a.fillRect(o.x*s, o.y*s, s, s);
 
