@@ -5,9 +5,11 @@ c.width=wi*s;
 c.height=he*s;
 c.style.border="red 1px solid";
 w=window;
-o=[];
+o=[]; // enemies
+u={}; // user
 timer="";
-m=[];
+m=[]; // gaming field
+//
 //TODO: colors 
 // blue -- water -- 0033ff (03f)
 // gray -- land -- 999999 (999)
@@ -33,7 +35,7 @@ area (surface) description:
 function startLevel(level)
 {
 	
-	o[0] = { // user
+	u = { // user
 		t:0,
 		c:"#390",
 		x:25,
@@ -42,9 +44,9 @@ function startLevel(level)
 	
 	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level+2);
-	
-	for (i=0;i<o.length;i++)
-	{
+
+	changeObjectPosition(u, u.x, u.y)
+	for(var i in o) {
 		changeObjectPosition(o[i], o[i].x, o[i].y);
 	}
 }
@@ -84,29 +86,19 @@ function verifyAreaType(x,y,type)
 	return (getAreaType(x,y) == type ? 1 : -1);
 }
 
-function moveObject(o)
-{
-	if (o.t) // not user
-		moveEnemy(o);
-	else
-		moveUser(o);
-	
-}
-
-function moveUser(o)
+function moveUser()
 {
 	// process moving user here
 
-	// check outer space
 	// check passing land-sea or sea-land border
-	if (o.v)
+	if (u.v)
 	{
-		x=!((o.v-1)*(o.v-3))?o.v-2:0;
-		y=!((o.v-2)*(o.v-4))?o.v-3:0;
-		if (getAreaType(o.x+x, o.y+y)!=0)
-			changeObjectPosition(o,o.x+x,o.y+y);
+		x=!((u.v-1)*(u.v-3))?u.v-2:0;
+		y=!((u.v-2)*(u.v-4))?u.v-3:0;
+		if (getAreaType(u.x+x, u.y+y)!=0)
+			changeObjectPosition(u,u.x+x,u.y+y);
 		else
-			o.v=0;
+			u.v=0;
 	}
 }
 
@@ -137,7 +129,7 @@ function moveEnemy(t)
 	inv.x = verifyAreaType(t.x + k, t.y, t.t) == -1;
 	n.x = t.x + verifyAreaType(t.x + k, t.y, t.t) * k;
 	
-	if ((n.x==o[0].x&&n.y==o[0].y)||verifyAreaType(t.x + k, t.y+ky, 3)==1)gameOver();
+	if ((n.x==u.x&&n.y==u.y)||verifyAreaType(t.x + k, t.y+ky, 3)==1)gameOver();
 	
 	changeEnemyVector(t, inv);
 	changeObjectPosition(t, n.x, n.y);
@@ -177,8 +169,9 @@ function changeObjectPosition(o,x2,y2){
 function togglePause(){
 	if (!timer){
 		timer = setInterval(function(){
+			moveUser();
 			for(var a in o) {
-				moveObject(o[a]);
+				moveEnemy(o[a]);
 			}
 		},50);
 	}else{
@@ -253,14 +246,15 @@ w.onload = function(){
 		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
 //		console.log(kc);
-		if (36<kc && kc<41)
-		{
-			/// todo: decide if we really need the ability to stop
-			o[0].v = (o[0].v && Math.abs(kc-36-o[0].v)%4)==2 ? 0 : kc-36;
-//			o[0].v = kc-36;
-		}
 
-		if (kc == 80 || kc == 32) // "P"
+		/// todo: decide if we really need the ability to stop
+		if (36<kc && kc<41)
+			u.v = kc-36;
+
+//		if (36<kc && kc<41)
+//			u.v = (u.v && Math.abs(kc-36-u.v)%4)==2 ? 0 : kc-36;
+
+		if (kc == 80 || kc == 32) // "P" or "Space"
 			togglePause();
 
 	}, false);
