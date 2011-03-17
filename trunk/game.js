@@ -40,7 +40,7 @@ function startLevel(level)
 		y:28
 	};
 	
-//	createObjects(1, (level>7?7:level)); // max land enemies count is 7
+	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level+2);
 	
 	for (i=0;i<o.length;i++)
@@ -157,7 +157,12 @@ function changeEnemyVector(o,inv){
 
 // Used only for start level
 function getRandCoords(type){
-	return ((type==1)?{x:1,y:1}:{x:Math.round(Math.random()*wi),y:Math.round(Math.random()*he)});
+
+	do {
+		n = {x:Math.round(Math.random()*wi),y:Math.round(Math.random()*he)}
+	} while (verifyAreaType(n.x, n.y, type) != 1);
+
+	return n;
 }
 
 // draw object at new coordinates and delete it from old coordinates
@@ -246,7 +251,7 @@ w.onload = function(){
 //			o[0].v = kc-36;
 		}
 
-		if (kc == 80) // "P"
+		if (kc == 80 || kc == 32) // "P"
 			togglePause();
 
 	}, false);
