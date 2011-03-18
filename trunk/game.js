@@ -6,16 +6,19 @@ c.height=he*s;
 c.style.border="red 1px solid";
 w=window;
 o=[]; // enemies
-u={}; // user
+//u={}; // user //нахуй? если объект создается в старте левела
 timer="";
 m=[]; // gaming field
 //
+Mro=Math.round;
+Mra=Math.random;
 //TODO: colors 
-// blue -- water -- 0033ff (03f)
-// gray -- land -- 999999 (999)
-// green -- player -- 339900 (390)
-// red -- AI -- ff0000 (f00)
-// yellow -- path  -- ffff00 (ff0)
+// blue -- water -- 0033ff (03f) -- #2
+// gray -- land -- 999999 (999) -- #1
+// green -- player -- 339900 (390) --#4
+// red -- AI -- ff0000 (f00) -- #3
+// yellow -- path  -- ffff00 (ff0) --5
+
 /*
 Object description:
 o = { 
@@ -37,7 +40,7 @@ function startLevel(level)
 	
 	u = { // user
 		t:0,
-		c:"#390",
+		c:4,
 		x:wi/2,
 		y:he-2
 	};
@@ -47,7 +50,8 @@ function startLevel(level)
 
 	changeObjectPosition(u, u.x, u.y)
 	for(var i in o) {
-		changeObjectPosition(o[i], o[i].x, o[i].y);
+		t=o[i];
+		changeObjectPosition(t, t.x, t.y);
 	}
 }
 
@@ -59,8 +63,8 @@ function createObjects(type, count)
 		coords = getRandCoords(type);
 		o.push({
 			t:type,
-			c:"#f00",
-			v:Math.round(Math.random() * 3) + 5, // 5..8
+			c:3,
+			v:Mro(Mra() * 3) + 5, // 5..8
 			x:coords.x,
 			y:coords.y
 		});
@@ -87,17 +91,20 @@ function verifyAreaType(x,y,type)
 
 function moveUser()
 {
-	// process moving user here
-
-	// check passing land-sea or sea-land border
 	if (u.v)
 	{
 		x=!((u.v-1)*(u.v-3))?u.v-2:0;
 		y=!((u.v-2)*(u.v-4))?u.v-3:0;
-		if (getAreaType(u.x+x, u.y+y)!=0)
+		if (getAreaType(u.x+x, u.y+y)) {
+			(getAreaType(u.x+x, u.y+y)==2)?u.l=1:0;
 			changeObjectPosition(u,u.x+x,u.y+y);
-		else
-			u.v=0;
+		} else {
+			u.l=u.v=0;
+		}
+	}
+	if(u.l && getAreaType(u.x, u.y)==1) {
+		u.v=u.l=0;
+		fillMap();
 	}
 }
 
@@ -146,7 +153,7 @@ function changeEnemyVector(o,inv){
 function getRandCoords(type){
 
 	do {
-		n = {x:Math.round(Math.random()*wi),y:Math.round(Math.random()*he)}
+		n = {x:Mro(Mra()*wi),y:Mro(Mra()*he)}
 	} while (verifyAreaType(n.x, n.y, type) != 1);
 
 	return n;
@@ -155,13 +162,11 @@ function getRandCoords(type){
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o,x2,y2){
 	// Delete old item first
-	if((!o.t&&m[o.x][o.y]==2)||(m[o.x][o.y]==3)){c="#ff0";m[o.x][o.y]=3;}else c=((m[o.x][o.y]==1)?"#999":"#03f");
-	a.fillStyle=c;
-	a.fillRect(o.x*s, o.y*s, s, s);
+	if((!o.t&&m[o.x][o.y]==2)||(m[o.x][o.y]==3)){c=5;m[o.x][o.y]=3;}else c=((m[o.x][o.y]==1)?1:2);
+	drawBlock(o.x,o.y,c);
 
 	// Draw new item
-	a.fillStyle = o.c;
-	a.fillRect(x2*s, y2*s, s, s);
+	drawBlock(x2,y2,o.c);
 	o.x=x2;o.y=y2;
 }
 
@@ -214,8 +219,7 @@ function generateMap() {
 			k=2;
 			if(j<2||j>he-3||i<2||i>wi-3) k=1;
 			map.push(k);
-			a.fillStyle=((k==1)?"#999":"#03f");
-			a.fillRect(i*s,j*s,s,s);
+			drawBlock(i,j,k)
 			j--;
 		}
 		m.push(map);
@@ -232,6 +236,22 @@ function gameOver() {
 	a.fillText("You have died of dysentery", 80, (he/2*s));
 }
 
+function fillMap() {
+	i=wi-1;
+	while(i>=0) {
+		j=he-1;
+		while(j>=0) {
+			if(m[i][j]==3){m[i][j]=1;drawBlock(i,j,1)}
+			j--;
+		}
+		i--;
+	}
+}
+
+function drawBlock(x,y,c){
+	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":"#ff0")));
+	a.fillRect(x*s,y*s,s,s);
+}
 
 w.onload = function(){
 	generateMap();
