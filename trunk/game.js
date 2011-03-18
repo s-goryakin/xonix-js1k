@@ -162,12 +162,21 @@ function getRandCoords(type){
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o,x2,y2){
 	// Delete old item first
-	if((!o.t&&m[o.x][o.y]==2)||(m[o.x][o.y]==3)){c=5;m[o.x][o.y]=3;}else c=((m[o.x][o.y]==1)?1:2);
-	drawBlock(o.x,o.y,c);
+	if ((!o.t && m[o.x][o.y] == 2) || (m[o.x][o.y] == 3))
+	{
+		c = 5;
+		m[o.x][o.y] = 3;
+	}
+	else
+	{
+		c = m[o.x][o.y] == 1 ? 1 : 2;
+	}
+	drawBlock(o.x, o.y, c);
 
 	// Draw new item
-	drawBlock(x2,y2,o.c);
-	o.x=x2;o.y=y2;
+	drawBlock(x2, y2, o.c);
+	o.x = x2;
+	o.y = y2;
 }
 
 function togglePause(){
@@ -241,7 +250,11 @@ function fillMap() {
 	while(i>=0) {
 		j=he-1;
 		while(j>=0) {
-			if(m[i][j]==3){m[i][j]=1;drawBlock(i,j,1)}
+			if (m[i][j] == 3)
+			{
+				m[i][j] = 1;
+				drawBlock(i, j, 1);
+			}
 			j--;
 		}
 		i--;
