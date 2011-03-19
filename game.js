@@ -246,20 +246,70 @@ function gameOver() {
 }
 
 function fillMap() {
+	for(var a in o) {
+		tmp_array = [];
+		tmp_array.push({x: o[a].x, y: o[a].y});
+		while(tmp_array.length > 0) {
+			tmp_el = tmp_array.shift();
+			x=tmp_el.x;
+			y=tmp_el.y;
+			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
+				if (m[x-1][y]==2) {
+					tmp_array.push({x: x-1, y: y});
+					m[x-1][y]=9;
+				}
+				if (m[x+1][y]==2) {
+					tmp_array.push({x: x+1, y: y});
+					m[x+1][y]=9
+				}
+				if (m[x][y-1]==2) {
+					tmp_array.push({x: x, y: y-1});
+					m[x][y-1]=9;
+				}
+				if (m[x][y+1]==2) {
+					tmp_array.push({x: x, y: y+1});
+					m[x][y+1]=9;
+				}
+				if (m[x-1][y+1]==2) {
+					tmp_array.push({x: x-1, y: y+1});
+					m[x-1][y+1]=9;
+				}
+				if (m[x-1][y-1]==2) {
+					tmp_array.push({x: x-1, y: y-1});
+					m[x-1][y-1]=9;
+				}
+				if (m[x+1][y+1]==2) {
+					tmp_array.push({x: x+1, y: y+1});
+					m[x+1][y+1]=9;
+				}
+				if (m[x+1][y-1]==2) {
+					tmp_array.push({x: x+1, y: y-1});
+					m[x+1][y-1]=9;
+				}
+			}
+		}
+		
+	}
+	
 	i=wi-1;
 	while(i>=0) {
 		j=he-1;
 		while(j>=0) {
-			if (m[i][j] == 3)
+			if (m[i][j] > 1 && m[i][j] < 4)
 			{
 				m[i][j] = 1;
 				drawBlock(i, j, 1);
+			}
+			if (m[i][j]==9) {
+				m[i][j] = 2;
 			}
 			j--;
 		}
 		i--;
 	}
 }
+
+
 
 function drawBlock(x,y,c){
 	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":"#ff0")));
