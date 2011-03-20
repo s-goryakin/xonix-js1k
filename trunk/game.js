@@ -6,10 +6,10 @@ c.height=he*s;
 c.style.border="red 1px solid";
 w=window;
 o=[]; // enemies
-//u={}; // user //нахуй? если объект создается в старте левела
 timer="";
+delay = 50;
 m=[]; // gaming field
-//
+
 Mro=Math.round;
 Mra=Math.random;
 //TODO: colors 
@@ -17,7 +17,7 @@ Mra=Math.random;
 // gray -- land -- 999999 (999) -- #1
 // green -- player -- 339900 (390) --#4
 // red -- AI -- ff0000 (f00) -- #3
-// yellow -- path  -- ffff00 (ff0) --5
+// yellow -- path	-- ffff00 (ff0) --5
 
 /*
 Object description:
@@ -53,6 +53,7 @@ function startLevel(level)
 		t=o[i];
 		changeObjectPosition(t, t.x, t.y);
 	}
+	console.log(o);
 }
 
 // initialize game object and store it in the objects array
@@ -60,11 +61,12 @@ function createObjects(type, count)
 {
 	for(i=0;i<count;i++)
 	{
+		v = Mro(Mra() * 3) + 5;
 		coords = getRandCoords(type);
 		o.push({
 			t:type,
 			c:3,
-			v:Mro(Mra() * 3) + 5, // 5..8
+			v:v>6?v+2:v,
 			x:coords.x,
 			y:coords.y
 		});
@@ -82,11 +84,12 @@ function getAreaType(x,y){
 		return m[x][y];
 }
 
-// check if area is the same type with specified one
-// return 1 is they are equal and -1 if not
-function verifyAreaType(x,y,type)
+function enemyCanBeHere(x, y, type)
 {
-	return (getAreaType(x,y) == type ? 1 : -1);
+	if (type == 1)
+		return getAreaType(x, y) == 1;
+
+	return !(getAreaType(x, y) == 1);
 }
 
 function moveUser()
@@ -110,35 +113,62 @@ function moveUser()
 
 function moveEnemy(t)
 {
-//	logObject(o, 1);
-	/// todo: check if (x, y+k) and (x+k, y) are of the same type, but (x+k, y+k) is not
-	n = {};
-	inv = {};
-	if (t.v < 7) // vector is 5 or 6
-	{
-		ky = -1;
-	}
-	else // vector is 7 or 8
-	{
-		ky = 1;
-	}
-	inv.y = verifyAreaType(t.x, t.y + ky, t.t) == -1;
-	n.y = t.y + verifyAreaType(t.x, t.y + ky, t.t) * ky;
+	createNewEnemyVector(t);
 	
-	if ((t.v-6)*(t.v-7)) // vector is 5 or 8
+	kx = getKX(t);
+	ky = getKY(t);
+
+	if (enemyCanBeHere(t.x+kx, t.y+ky, t.t))
+		changeObjectPosition(t, t.x+kx, t.y+ky);
+
+	checkGameOver(t);
+}
+
+function checkGameOver(t)
+{
+	if (t.x == u.x && t.y == u.y || getAreaType(t.x, t.y) == 3)
+		gameOver();
+}
+
+function createNewEnemyVector(t)
+{
+	kx = getKX(t);
+	ky = getKY(t);
+	v = t.v;
+	
+	if (!enemyCanBeHere(t.x+kx, t.y, t.t))
+		invertX(t);
+		
+	if (!enemyCanBeHere(t.x, t.y+ky, t.t))
+		invertY(t);
+	
+	if (v == t.v && !enemyCanBeHere(t.x+kx, t.y+ky, t.t)) // we need to check if we already changed the vector
 	{
-		k = -1;
-	} else {
-		k = 1;
+		invertX(t);
+		invertY(t);
 	}
 
-	inv.x = verifyAreaType(t.x + k, t.y, t.t) == -1;
-	n.x = t.x + verifyAreaType(t.x + k, t.y, t.t) * k;
-	
-	if ((n.x==u.x&&n.y==u.y)||verifyAreaType(t.x + k, t.y+ky, 3)==1)gameOver();
-	
-	changeEnemyVector(t, inv);
-	changeObjectPosition(t, n.x, n.y);
+	return;
+}
+
+function getKY(t)
+{
+	return (t.v & 4) / 4 - (t.v & 8) / 8;
+}
+function getKX(t)
+{
+	return (t.v & 1) / 1 - (t.v & 2) / 2;
+}
+
+function invertX(t)
+{
+	var y = (t.v & 4) + (t.v & 8);
+	t.v = y + !(t.v&1)*1 + !(t.v&2)*2;
+}
+function invertY(t)
+{
+	var x = (t.v & 1) + (t.v & 2);
+	t.v = x + !(t.v&4)*4 + !(t.v&8)*8;
 }
 
 function changeEnemyVector(o,inv){
@@ -154,7 +184,7 @@ function getRandCoords(type){
 
 	do {
 		n = {x:Mro(Mra()*wi),y:Mro(Mra()*he)}
-	} while (verifyAreaType(n.x, n.y, type) != 1);
+	} while (getAreaType(n.x, n.y) != type);
 
 	return n;
 }
@@ -172,7 +202,6 @@ function changeObjectPosition(o,x2,y2){
 		c = m[o.x][o.y] == 1 ? 1 : 2;
 	}
 	drawBlock(o.x, o.y, c);
-
 	// Draw new item
 	drawBlock(x2, y2, o.c);
 	o.x = x2;
@@ -186,36 +215,10 @@ function togglePause(){
 			for(var a in o) {
 				moveEnemy(o[a]);
 			}
-		},50);
+		}, delay);
 	}else{
 		clearInterval(timer);
 		timer = "";
-	}
-}
-
-function logObject(o,log_walls){
-	console.log(
-		'v: '+o.v,
-		'x: '+o.x,
-		'y: '+o.y
-	);
-	if (log_walls)
-	{
-		console.log(
-			getAreaType(o.x-1, o.y-1),
-			getAreaType(o.x-0, o.y-1),
-			getAreaType(o.x+1, o.y-1)
-		);
-		console.log(
-			getAreaType(o.x-1, o.y),
-			5,
-			getAreaType(o.x+1, o.y)
-		);
-		console.log(
-			getAreaType(o.x-1, o.y+1),
-			getAreaType(o.x-0, o.y+1),
-			getAreaType(o.x+1, o.y+1)
-		);
 	}
 }
 
@@ -242,7 +245,7 @@ function gameOver() {
 	a.fillRect(0,0,wi*s,he*s);
 	a.fillStyle="white";
 	a.font = "25px Arial";
-	a.fillText("You have died of dysentery", 80, (he/2*s));
+	a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
 }
 
 function fillMap() {
@@ -254,34 +257,50 @@ function fillMap() {
 			x=tmp_el.x;
 			y=tmp_el.y;
 			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
+				if (typeof m[x-1] == "undefined")
+				console.log("checking["+(x-1)+", "+(y-0)+"]");
 				if (m[x-1][y]==2) {
 					tmp_array.push({x: x-1, y: y});
 					m[x-1][y]=9;
 				}
+				if (typeof m[x+1] == "undefined")
+				console.log("checking["+(x+1)+", "+(y-0)+"]");
 				if (m[x+1][y]==2) {
 					tmp_array.push({x: x+1, y: y});
 					m[x+1][y]=9
 				}
+				if (typeof m[x] == "undefined")
+				console.log("checking["+(x-0)+", "+(y-1)+"]");
 				if (m[x][y-1]==2) {
 					tmp_array.push({x: x, y: y-1});
 					m[x][y-1]=9;
 				}
+				if (typeof m[x] == "undefined")
+				console.log("checking["+(x-0)+", "+(y+1)+"]");
 				if (m[x][y+1]==2) {
 					tmp_array.push({x: x, y: y+1});
 					m[x][y+1]=9;
 				}
+				if (typeof m[x-1] == "undefined")
+				console.log("checking["+(x-1)+", "+(y+1)+"]");
 				if (m[x-1][y+1]==2) {
 					tmp_array.push({x: x-1, y: y+1});
 					m[x-1][y+1]=9;
 				}
+				if (typeof m[x-1] == "undefined")
+				console.log("checking["+(x-1)+", "+(y-1)+"]");
 				if (m[x-1][y-1]==2) {
 					tmp_array.push({x: x-1, y: y-1});
 					m[x-1][y-1]=9;
 				}
+				if (typeof m[x+1] == "undefined")
+				console.log("checking["+(x+1)+", "+(y+1)+"]");
 				if (m[x+1][y+1]==2) {
 					tmp_array.push({x: x+1, y: y+1});
 					m[x+1][y+1]=9;
 				}
+				if (typeof m[x+1] == "undefined")
+				console.log("checking["+(x+1)+", "+(y-1)+"]");
 				if (m[x+1][y-1]==2) {
 					tmp_array.push({x: x+1, y: y-1});
 					m[x+1][y-1]=9;
@@ -322,20 +341,10 @@ w.onload = function(){
 	w.addEventListener('keydown', function(e) {
 		
 		// we need to change vector or user object here
-		
-		/// todo: check previous vector and if it's opposite then just stop
-		
-		// key codes are: 37 - left, 38 - up, 39 - right, 40 - down
 		kc=e.keyCode
-//		console.log(kc);
-
-		/// todo: decide if we really need the ability to stop
 		if (36<kc && kc<41)
 			u.v = kc-36;
-
-//		if (36<kc && kc<41)
-//			u.v = (u.v && Math.abs(kc-36-u.v)%4)==2 ? 0 : kc-36;
-
+		
 		if (kc == 80 || kc == 32) // "P" or "Space"
 			togglePause();
 
