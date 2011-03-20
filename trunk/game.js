@@ -53,7 +53,7 @@ function startLevel(level)
 		t=o[i];
 		changeObjectPosition(t, t.x, t.y);
 	}
-	console.log(o);
+//	console.log(o);
 }
 
 // initialize game object and store it in the objects array
@@ -257,50 +257,50 @@ function fillMap() {
 			x=tmp_el.x;
 			y=tmp_el.y;
 			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
-				if (typeof m[x-1] == "undefined")
-				console.log("checking["+(x-1)+", "+(y-0)+"]");
+//				if (typeof m[x-1] == "undefined")
+//				console.log("checking["+(x-1)+", "+(y-0)+"]");
 				if (m[x-1][y]==2) {
 					tmp_array.push({x: x-1, y: y});
 					m[x-1][y]=9;
 				}
-				if (typeof m[x+1] == "undefined")
-				console.log("checking["+(x+1)+", "+(y-0)+"]");
+//				if (typeof m[x+1] == "undefined")
+//				console.log("checking["+(x+1)+", "+(y-0)+"]");
 				if (m[x+1][y]==2) {
 					tmp_array.push({x: x+1, y: y});
 					m[x+1][y]=9
 				}
-				if (typeof m[x] == "undefined")
-				console.log("checking["+(x-0)+", "+(y-1)+"]");
+//				if (typeof m[x] == "undefined")
+//				console.log("checking["+(x-0)+", "+(y-1)+"]");
 				if (m[x][y-1]==2) {
 					tmp_array.push({x: x, y: y-1});
 					m[x][y-1]=9;
 				}
-				if (typeof m[x] == "undefined")
-				console.log("checking["+(x-0)+", "+(y+1)+"]");
+//				if (typeof m[x] == "undefined")
+//				console.log("checking["+(x-0)+", "+(y+1)+"]");
 				if (m[x][y+1]==2) {
 					tmp_array.push({x: x, y: y+1});
 					m[x][y+1]=9;
 				}
-				if (typeof m[x-1] == "undefined")
-				console.log("checking["+(x-1)+", "+(y+1)+"]");
+//				if (typeof m[x-1] == "undefined")
+//				console.log("checking["+(x-1)+", "+(y+1)+"]");
 				if (m[x-1][y+1]==2) {
 					tmp_array.push({x: x-1, y: y+1});
 					m[x-1][y+1]=9;
 				}
-				if (typeof m[x-1] == "undefined")
-				console.log("checking["+(x-1)+", "+(y-1)+"]");
+//				if (typeof m[x-1] == "undefined")
+//				console.log("checking["+(x-1)+", "+(y-1)+"]");
 				if (m[x-1][y-1]==2) {
 					tmp_array.push({x: x-1, y: y-1});
 					m[x-1][y-1]=9;
 				}
-				if (typeof m[x+1] == "undefined")
-				console.log("checking["+(x+1)+", "+(y+1)+"]");
+//				if (typeof m[x+1] == "undefined")
+//				console.log("checking["+(x+1)+", "+(y+1)+"]");
 				if (m[x+1][y+1]==2) {
 					tmp_array.push({x: x+1, y: y+1});
 					m[x+1][y+1]=9;
 				}
-				if (typeof m[x+1] == "undefined")
-				console.log("checking["+(x+1)+", "+(y-1)+"]");
+//				if (typeof m[x+1] == "undefined")
+//				console.log("checking["+(x+1)+", "+(y-1)+"]");
 				if (m[x+1][y-1]==2) {
 					tmp_array.push({x: x+1, y: y-1});
 					m[x+1][y-1]=9;
