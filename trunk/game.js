@@ -81,7 +81,14 @@ function getAreaType(x,y){
 	if (x < 0 || y < 0 || x >= wi || y >= he)
 		return 0;
 	else
+	{
+//		console.log(typeof m[x]);
+//		if (typeof m[x] == "undefined" || typeof m[x][y] == "undefined")
+//			console.log("Trying to get area type ");
+//		if (typeof x == "undefined" || typeof y == "undefined")
+//			console.log("Trying to get area type ");
 		return m[x][y];
+	}
 }
 
 function enemyCanBeHere(x, y, type)
@@ -248,7 +255,7 @@ function gameOver() {
 	a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
 }
 
-function fillMap() {
+function fillMap2() {
 	for(var a in o) {
 		tmp_array = [];
 		tmp_array.push({x: o[a].x, y: o[a].y});
@@ -257,50 +264,34 @@ function fillMap() {
 			x=tmp_el.x;
 			y=tmp_el.y;
 			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
-//				if (typeof m[x-1] == "undefined")
-//				console.log("checking["+(x-1)+", "+(y-0)+"]");
 				if (m[x-1][y]==2) {
 					tmp_array.push({x: x-1, y: y});
 					m[x-1][y]=9;
 				}
-//				if (typeof m[x+1] == "undefined")
-//				console.log("checking["+(x+1)+", "+(y-0)+"]");
 				if (m[x+1][y]==2) {
 					tmp_array.push({x: x+1, y: y});
 					m[x+1][y]=9
 				}
-//				if (typeof m[x] == "undefined")
-//				console.log("checking["+(x-0)+", "+(y-1)+"]");
 				if (m[x][y-1]==2) {
 					tmp_array.push({x: x, y: y-1});
 					m[x][y-1]=9;
 				}
-//				if (typeof m[x] == "undefined")
-//				console.log("checking["+(x-0)+", "+(y+1)+"]");
 				if (m[x][y+1]==2) {
 					tmp_array.push({x: x, y: y+1});
 					m[x][y+1]=9;
 				}
-//				if (typeof m[x-1] == "undefined")
-//				console.log("checking["+(x-1)+", "+(y+1)+"]");
 				if (m[x-1][y+1]==2) {
 					tmp_array.push({x: x-1, y: y+1});
 					m[x-1][y+1]=9;
 				}
-//				if (typeof m[x-1] == "undefined")
-//				console.log("checking["+(x-1)+", "+(y-1)+"]");
 				if (m[x-1][y-1]==2) {
 					tmp_array.push({x: x-1, y: y-1});
 					m[x-1][y-1]=9;
 				}
-//				if (typeof m[x+1] == "undefined")
-//				console.log("checking["+(x+1)+", "+(y+1)+"]");
 				if (m[x+1][y+1]==2) {
 					tmp_array.push({x: x+1, y: y+1});
 					m[x+1][y+1]=9;
 				}
-//				if (typeof m[x+1] == "undefined")
-//				console.log("checking["+(x+1)+", "+(y-1)+"]");
 				if (m[x+1][y-1]==2) {
 					tmp_array.push({x: x+1, y: y-1});
 					m[x+1][y-1]=9;
@@ -329,9 +320,59 @@ function fillMap() {
 }
 
 
+function fillMap()
+{
+	for(var i in o) {
+		backupSea(o[i].x, o[i].y);
+	}
+	togglePause();
+	fillLand();
+}
+
+function backupSea(x, y)
+{
+	type = getAreaType(x, y);
+	if (type != 2)
+		return;
+	
+	m[x][y] = 9;
+	drawBlock(x, y, 9);
+	coords = [
+		 {x:x+1, y:y}
+		,{x:x-1, y:y}
+		,{x:x, y:y+1}
+		,{x:x, y:y-1}
+	];
+	for (i in coords)
+	{
+		backupSea(coords[i].x, coords[i].y);
+	}
+}
+
+function fillLand()
+{
+	i=wi-1;
+	while(i>=0) {
+		j=he-1;
+		while(j>=0) {
+			if (m[i][j] > 1 && m[i][j] < 4)
+			{
+				m[i][j] = 1;
+				drawBlock(i, j, 1);
+			}
+			if (m[i][j]==9) {
+				m[i][j] = 2;
+			}
+			j--;
+		}
+		i--;
+	}
+}
+
 
 function drawBlock(x,y,c){
-	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":"#ff0")));
+//	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":"#ff0")));
+	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":((c==9)?"#fff":"#ff0"))));
 	a.fillRect(x*s,y*s,s,s);
 }
 
