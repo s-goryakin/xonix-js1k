@@ -11,7 +11,7 @@ o=[]; // enemies
 timer="";
 delay = 50;
 m=[]; // gaming field
-
+level=1;
 Mro=Math.round;
 Mra=Math.random;
 //TODO: colors
@@ -37,9 +37,11 @@ area (surface) description:
 3 - sand // user moves over the sea
 */
 // process all routine for starting level
-function startLevel(level)
+function startLevel()
 {
-
+	m=[];
+	o=[];
+	generateMap();
 	u = { // user
 		t:0,
 		c:4,
@@ -303,7 +305,13 @@ function fillMap() {
 		}
 		i--;
 	}
-	console.log(100-parseInt(f/a*100));
+	b=100-parseInt(f/a*100);
+	(b>10)?nextLevel():0;
+}
+
+function nextLevel() {
+	togglePause();
+	startLevel(level++);
 }
 
 
@@ -348,8 +356,7 @@ function drawBlock(x,y,c){
 }
 
 w.onload = function(){
-	generateMap();
-	startLevel(1);
+	startLevel(level);
 	w.addEventListener('keydown', function(e) {
 
 		// we need to change vector or user object here
