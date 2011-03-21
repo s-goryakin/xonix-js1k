@@ -47,9 +47,9 @@ function startLevel(level)
 		y:he-2
 	};
 
-//	createObjects(1, (level>7?7:level)); // max land enemies count is 7
-//	createObjects(2, level+1);
-	createObjects(2, level);
+	createObjects(1, (level>7?7:level)); // max land enemies count is 7
+	createObjects(2, level+1);
+//	createObjects(2, level);
 
 	changeObjectPosition(u, u.x, u.y)
 	for(var i in o) {
@@ -108,7 +108,9 @@ function moveUser()
 	{
 		x=!((u.v-1)*(u.v-3))?u.v-2:0;
 		y=!((u.v-2)*(u.v-4))?u.v-3:0;
-		if (getAreaType(u.x+x, u.y+y)) {
+		t = getAreaType(u.x+x, u.y+y);
+		if (t==3) gameOver();
+		if (t) {
 			(getAreaType(u.x+x, u.y+y)==2)?u.l=1:0;
 			changeObjectPosition(u,u.x+x,u.y+y);
 		} else {
@@ -260,6 +262,7 @@ function gameOver() {
 
 function fillMap() {
 	for(var a in o) {
+		if(o[a].t<2)continue;
 		tmp_array = [];
 		tmp_array.push({x: o[a].x, y: o[a].y});
 		while(tmp_array.length > 0) {
@@ -278,9 +281,11 @@ function fillMap() {
 				}
 			}
 		}
-
 	}
+	//console.log(m);
 
+	a=(wi-4)*(he-4);
+	f=0
 	i=wi-1;
 	while(i>=0) {
 		j=he-1;
@@ -291,24 +296,16 @@ function fillMap() {
 				drawBlock(i, j, 1);
 			}
 			if (m[i][j]==9) {
+				f++;
 				m[i][j] = 2;
 			}
 			j--;
 		}
 		i--;
 	}
+	console.log(100-parseInt(f/a*100));
 }
 
-
-function fillMap1()
-{
-	for(var i in o) {
-		markAsBackup(o[i].x, o[i].y);
-		backupSea(o[i].x, o[i].y);
-	}
-	togglePause();
-	fillLand();
-}
 
 function markAsBackup(ax, ay)
 {
@@ -336,26 +333,6 @@ function backupSea(ax, ay)
 				{
 					markAsBackup(coords[i].x, coords[i].y);
 				}
-			}
-			j--;
-		}
-		i--;
-	}
-}
-
-function fillLand()
-{
-	i=wi-1;
-	while(i>=0) {
-		j=he-1;
-		while(j>=0) {
-			if (m[i][j] > 1 && m[i][j] < 4)
-			{
-				m[i][j] = 1;
-				drawBlock(i, j, 1);
-			}
-			if (m[i][j]==9) {
-				m[i][j] = 2;
 			}
 			j--;
 		}
