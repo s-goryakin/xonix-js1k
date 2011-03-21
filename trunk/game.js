@@ -8,12 +8,13 @@ c.height=he*s;
 c.style.border="red 1px solid";
 w=window;
 o=[]; // enemies
-timer="";
-delay = 50;
 m=[]; // gaming field
 level=1;
+timer="";
 Mro=Math.round;
 Mra=Math.random;
+_fs="fillStyle";
+_fr="fillRect";
 //TODO: colors
 // blue -- water -- 0033ff (03f) -- #2
 // gray -- land -- 999999 (999) -- #1
@@ -41,7 +42,7 @@ function startLevel()
 {
 	m=[];
 	o=[];
-	generateMap();
+	generateMap(1);
 	u = { // user
 		t:0,
 		c:4,
@@ -229,35 +230,49 @@ function togglePause(){
 			for(var a in o) {
 				moveEnemy(o[a]);
 			}
-		}, delay);
+		}, 50);
 	}else{
 		clearInterval(timer);
 		timer = "";
 	}
 }
 
-function generateMap() {
+function generateMap(a) {
 	i=wi-1;
+	(!a)?f=0:0;
 	while(i>=0) {
-		map=[];
+		(a)?map=[]:0;
 		j=he-1;
 		while(j>=0) {
-			k=2;
-			if(j<2||j>he-3||i<2||i>wi-3) k=1;
-			map.push(k);
-			drawBlock(i,j,k)
+			if(a) {
+				k=2;
+				if(j<2||j>he-3||i<2||i>wi-3) k=1;
+				map.push(k);
+				drawBlock(i,j,k)
+			} else if(a==0) {
+				if (m[i][j] > 1 && m[i][j] < 4)
+				{
+					m[i][j] = 1;
+					drawBlock(i, j, 1);
+				}
+				if (m[i][j]==9) {
+					f++;
+					m[i][j] = 2;
+				}
+			}
 			j--;
 		}
-		m.push(map);
+		(a)?m.push(map):0;
 		i--;
 	}
+	return (!a)?f:0;
 }
 
 function gameOver() {
 	togglePause();
-	a.fillStyle="red";
-	a.fillRect(0,0,wi*s,he*s);
-	a.fillStyle="white";
+	a[_fs]="red";
+	a[_fr](0,0,wi*s,he*s);
+	a[_fs]="white";
 	a.font = "25px Arial";
 	a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
 }
@@ -284,29 +299,10 @@ function fillMap() {
 			}
 		}
 	}
-	//console.log(m);
-
 	a=(wi-4)*(he-4);
-	f=0
-	i=wi-1;
-	while(i>=0) {
-		j=he-1;
-		while(j>=0) {
-			if (m[i][j] > 1 && m[i][j] < 4)
-			{
-				m[i][j] = 1;
-				drawBlock(i, j, 1);
-			}
-			if (m[i][j]==9) {
-				f++;
-				m[i][j] = 2;
-			}
-			j--;
-		}
-		i--;
-	}
+	f=generateMap(0);
 	b=100-parseInt(f/a*100);
-	(b>10)?nextLevel():0;
+	(b>86)?nextLevel():0;
 }
 
 function nextLevel() {
@@ -314,45 +310,10 @@ function nextLevel() {
 	startLevel(level++);
 }
 
-
-function markAsBackup(ax, ay)
-{
-	if (type != 2)
-		return;
-	m[ax][ay] = 9;
-	drawBlock(ax, ay, 9);
-}
-
-function backupSea(ax, ay)
-{
-	i=wi-1;
-	while(i>=0) {
-		j=he-1;
-		while(j>=0) {
-			if (m[i][j] == 9)
-			{
-				coords = [
-					 {x:ax+1, y:ay}
-					,{x:ax-1, y:ay}
-					,{x:ax, y:ay+1}
-					,{x:ax, y:ay-1}
-				];
-				for (i in coords)
-				{
-					markAsBackup(coords[i].x, coords[i].y);
-				}
-			}
-			j--;
-		}
-		i--;
-	}
-}
-
-
 function drawBlock(x,y,c){
 //	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":"#ff0")));
-	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":((c==9)?"#fff":"#ff0"))));
-	a.fillRect(x*s,y*s,s,s);
+	a[_fs]=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":((c==9)?"#fff":"#ff0"))));
+	a[_fr](x*s,y*s,s,s);
 }
 
 w.onload = function(){
