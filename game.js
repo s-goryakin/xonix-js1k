@@ -1,5 +1,7 @@
 wi=70;
 he=40;
+//wi=10;
+//he=5;
 s=10;
 c.width=wi*s;
 c.height=he*s;
@@ -12,7 +14,7 @@ m=[]; // gaming field
 
 Mro=Math.round;
 Mra=Math.random;
-//TODO: colors 
+//TODO: colors
 // blue -- water -- 0033ff (03f) -- #2
 // gray -- land -- 999999 (999) -- #1
 // green -- player -- 339900 (390) --#4
@@ -21,7 +23,7 @@ Mra=Math.random;
 
 /*
 Object description:
-o = { 
+o = {
 	t:type, // 0 - user, 1 - land, 2 - sea
 	c:color, // #390 - user, #f00 - AI
 	v:vector, // 0 - stop, 1 - left, 2 - up, 3 - right, 4 - down, 5 - left-up, 6 - up-right, 7 - right-down, 8 - down-left
@@ -37,16 +39,17 @@ area (surface) description:
 // process all routine for starting level
 function startLevel(level)
 {
-	
+
 	u = { // user
 		t:0,
 		c:4,
 		x:wi/2,
 		y:he-2
 	};
-	
-	createObjects(1, (level>7?7:level)); // max land enemies count is 7
-	createObjects(2, level+1);
+
+//	createObjects(1, (level>7?7:level)); // max land enemies count is 7
+//	createObjects(2, level+1);
+	createObjects(2, level);
 
 	changeObjectPosition(u, u.x, u.y)
 	for(var i in o) {
@@ -121,7 +124,7 @@ function moveUser()
 function moveEnemy(t)
 {
 	createNewEnemyVector(t);
-	
+
 	kx = getKX(t);
 	ky = getKY(t);
 
@@ -142,13 +145,13 @@ function createNewEnemyVector(t)
 	kx = getKX(t);
 	ky = getKY(t);
 	v = t.v;
-	
+
 	if (!enemyCanBeHere(t.x+kx, t.y, t.t))
 		invertX(t);
-		
+
 	if (!enemyCanBeHere(t.x, t.y+ky, t.t))
 		invertY(t);
-	
+
 	if (v == t.v && !enemyCanBeHere(t.x+kx, t.y+ky, t.t)) // we need to check if we already changed the vector
 	{
 		invertX(t);
@@ -255,7 +258,7 @@ function gameOver() {
 	a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
 }
 
-function fillMap2() {
+function fillMap() {
 	for(var a in o) {
 		tmp_array = [];
 		tmp_array.push({x: o[a].x, y: o[a].y});
@@ -264,43 +267,20 @@ function fillMap2() {
 			x=tmp_el.x;
 			y=tmp_el.y;
 			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
-				if (m[x-1][y]==2) {
-					tmp_array.push({x: x-1, y: y});
-					m[x-1][y]=9;
-				}
-				if (m[x+1][y]==2) {
-					tmp_array.push({x: x+1, y: y});
-					m[x+1][y]=9
-				}
-				if (m[x][y-1]==2) {
-					tmp_array.push({x: x, y: y-1});
-					m[x][y-1]=9;
-				}
-				if (m[x][y+1]==2) {
-					tmp_array.push({x: x, y: y+1});
-					m[x][y+1]=9;
-				}
-				if (m[x-1][y+1]==2) {
-					tmp_array.push({x: x-1, y: y+1});
-					m[x-1][y+1]=9;
-				}
-				if (m[x-1][y-1]==2) {
-					tmp_array.push({x: x-1, y: y-1});
-					m[x-1][y-1]=9;
-				}
-				if (m[x+1][y+1]==2) {
-					tmp_array.push({x: x+1, y: y+1});
-					m[x+1][y+1]=9;
-				}
-				if (m[x+1][y-1]==2) {
-					tmp_array.push({x: x+1, y: y-1});
-					m[x+1][y-1]=9;
+
+				coords = [{x: x-1, y: y}, {x: x+1, y: y}, {x: x, y: y-1}, {x: x, y: y+1}];
+				for (i in coords)
+				{
+					if (m[coords[i].x][coords[i].y] == 2) {
+						tmp_array.push({x: coords[i].x, y: coords[i].y});
+						m[coords[i].x][coords[i].y]=9;
+					}
 				}
 			}
 		}
-		
+
 	}
-	
+
 	i=wi-1;
 	while(i>=0) {
 		j=he-1;
@@ -320,32 +300,46 @@ function fillMap2() {
 }
 
 
-function fillMap()
+function fillMap1()
 {
 	for(var i in o) {
+		markAsBackup(o[i].x, o[i].y);
 		backupSea(o[i].x, o[i].y);
 	}
 	togglePause();
 	fillLand();
 }
 
-function backupSea(x, y)
+function markAsBackup(ax, ay)
 {
-	type = getAreaType(x, y);
 	if (type != 2)
 		return;
-	
-	m[x][y] = 9;
-	drawBlock(x, y, 9);
-	coords = [
-		 {x:x+1, y:y}
-		,{x:x-1, y:y}
-		,{x:x, y:y+1}
-		,{x:x, y:y-1}
-	];
-	for (i in coords)
-	{
-		backupSea(coords[i].x, coords[i].y);
+	m[ax][ay] = 9;
+	drawBlock(ax, ay, 9);
+}
+
+function backupSea(ax, ay)
+{
+	i=wi-1;
+	while(i>=0) {
+		j=he-1;
+		while(j>=0) {
+			if (m[i][j] == 9)
+			{
+				coords = [
+					 {x:ax+1, y:ay}
+					,{x:ax-1, y:ay}
+					,{x:ax, y:ay+1}
+					,{x:ax, y:ay-1}
+				];
+				for (i in coords)
+				{
+					markAsBackup(coords[i].x, coords[i].y);
+				}
+			}
+			j--;
+		}
+		i--;
 	}
 }
 
@@ -380,12 +374,12 @@ w.onload = function(){
 	generateMap();
 	startLevel(1);
 	w.addEventListener('keydown', function(e) {
-		
+
 		// we need to change vector or user object here
 		kc=e.keyCode
 		if (36<kc && kc<41)
 			u.v = kc-36;
-		
+
 		if (kc == 80 || kc == 32) // "P" or "Space"
 			togglePause();
 
