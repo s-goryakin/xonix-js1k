@@ -59,7 +59,6 @@ function startLevel()
 		t=o[i];
 		changeObjectPosition(t, t.x, t.y);
 	}
-//	console.log(o);
 }
 
 // initialize game object and store it in the objects array
@@ -93,7 +92,7 @@ function getAreaType(x,y){
 //			console.log("Trying to get area type ");
 //		if (typeof x == "undefined" || typeof y == "undefined")
 //			console.log("Trying to get area type ");
-		return m[x][y];
+		return m[y*wi+x];
 	}
 }
 
@@ -207,14 +206,16 @@ function getRandCoords(type){
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(o,x2,y2){
 	// Delete old item first
-	if ((!o.t && m[o.x][o.y] == 2) || (m[o.x][o.y] == 3))
+	z=o.y*wi+o.x;
+	//console.log(z);
+	if ((!o.t && m[z] == 2) || (m[z] == 3))
 	{
 		c = 5;
-		m[o.x][o.y] = 3;
+		m[z] = 3;
 	}
 	else
 	{
-		c = m[o.x][o.y] == 1 ? 1 : 2;
+		c = m[z] == 1 ? 1 : 2;
 	}
 	drawBlock(o.x, o.y, c);
 	// Draw new item
@@ -233,37 +234,30 @@ function togglePause(){
 		}, 50);
 	}else{
 		clearInterval(timer);
-		timer = "";
 	}
 }
 
 function generateMap(a) {
-	i=wi-1;
 	(!a)?f=0:0;
-	while(i>=0) {
-		(a)?map=[]:0;
-		j=he-1;
-		while(j>=0) {
-			if(a) {
-				k=2;
-				if(j<2||j>he-3||i<2||i>wi-3) k=1;
-				map.push(k);
-				drawBlock(i,j,k)
-			} else if(a==0) {
-				if (m[i][j] > 1 && m[i][j] < 4)
-				{
-					m[i][j] = 1;
-					drawBlock(i, j, 1);
-				}
-				if (m[i][j]==9) {
-					f++;
-					m[i][j] = 2;
-				}
+	for(i=wi*he-1;i>=0;i--){
+		x=i%wi;
+		y=parseInt(i/wi);
+		if (a) {
+			k=2;
+			if(y<2||y>he-3||x<2||x>wi-3) k=1;
+			m.push(k);
+			drawBlock(x,y,k);
+		} else if(a==0) {
+			if (m[i] > 1 && m[i] < 4)
+			{
+				m[i] = 1;
+				drawBlock(x, y, 1);
 			}
-			j--;
+			if (m[i]==9) {
+				f++;
+				m[i] = 2;
+			}
 		}
-		(a)?m.push(map):0;
-		i--;
 	}
 	return (!a)?f:0;
 }
@@ -287,13 +281,13 @@ function fillMap() {
 			x=tmp_el.x;
 			y=tmp_el.y;
 			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
-
 				coords = [{x: x-1, y: y}, {x: x+1, y: y}, {x: x, y: y-1}, {x: x, y: y+1}];
 				for (i in coords)
 				{
-					if (m[coords[i].x][coords[i].y] == 2) {
+					if (m[coords[i].y*wi+coords[i].x] == 2) {
 						tmp_array.push({x: coords[i].x, y: coords[i].y});
-						m[coords[i].x][coords[i].y]=9;
+						m[coords[i].y*wi+coords[i].x]=9;
+						m[coords[i].y*wi+coords[i].x]=9;
 					}
 				}
 			}
