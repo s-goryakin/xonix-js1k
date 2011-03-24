@@ -10,6 +10,7 @@ w=window;
 o=[]; // enemies
 m=[]; // gaming field
 level=1;
+lives=3;
 timer="";
 Mro=Math.round;
 Mra=Math.random;
@@ -225,7 +226,7 @@ function changeObjectPosition(o,x2,y2){
 }
 
 function togglePause(){
-	if (!timer){
+	if (!timer  && lives){
 		timer = setInterval(function(){
 			moveUser();
 			for(var a in o) {
@@ -234,6 +235,7 @@ function togglePause(){
 		}, 50);
 	}else{
 		clearInterval(timer);
+		timer="";
 	}
 }
 
@@ -263,12 +265,18 @@ function generateMap(a) {
 }
 
 function gameOver() {
+	lives--;
 	togglePause();
-	a[_fs]="red";
-	a[_fr](0,0,wi*s,he*s);
-	a[_fs]="white";
-	a.font = "25px Arial";
-	a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
+	if(lives>0) {
+		u.x=wi/2;u.y=he-1;
+	}
+	else {
+		a[_fs]="red";
+		a[_fr](0,0,wi*s,he*s);
+		a[_fs]="white";
+		a.font = "25px Arial";
+		a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
+	}
 }
 
 function fillMap() {
@@ -280,14 +288,14 @@ function fillMap() {
 			tmp_el = tmp_array.shift();
 			x=tmp_el.x;
 			y=tmp_el.y;
-			if (x-1 && x+1 < wi && y-1 && y+1 < he) {
+			if (x-1 && x <= wi && y-1 && y <= he) {
 				coords = [{x: x-1, y: y}, {x: x+1, y: y}, {x: x, y: y-1}, {x: x, y: y+1}];
 				for (i in coords)
 				{
-					if (m[coords[i].y*wi+coords[i].x] == 2) {
+					z=coords[i].y*wi+coords[i].x;
+					if (m[z] == 2) {
 						tmp_array.push({x: coords[i].x, y: coords[i].y});
-						m[coords[i].y*wi+coords[i].x]=9;
-						m[coords[i].y*wi+coords[i].x]=9;
+						m[z]=9;
 					}
 				}
 			}
@@ -316,6 +324,7 @@ w.onload = function(){
 
 		// we need to change vector or user object here
 		kc=e.keyCode
+		console.log(kc);
 		if (36<kc && kc<41)
 			u.v = kc-36;
 
