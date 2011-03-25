@@ -240,16 +240,17 @@ function togglePause(){
 }
 
 function generateMap(a) {
-	(!a)?f=0:0;
+	(a==0)?f=0:0;
 	for(i=wi*he-1;i>=0;i--){
 		x=i%wi;
 		y=parseInt(i/wi);
-		if (a) {
+		if (a==1) {
 			k=2;
 			if(y<2||y>he-3||x<2||x>wi-3) k=1;
 			m.push(k);
 			drawBlock(x,y,k);
-		} else if(a==0) {
+		}
+		if(a==0) {
 			if (m[i] > 1 && m[i] < 4)
 			{
 				m[i] = 1;
@@ -260,14 +261,21 @@ function generateMap(a) {
 				m[i] = 2;
 			}
 		}
+		if(a==2) {
+			if(m[i]!=1) {
+				m[i]=2;
+				drawBlock(x, y, 2);
+			}
+		}
 	}
-	return (!a)?f:0;
+	return (a==0)?f:0;
 }
 
 function gameOver() {
 	lives--;
 	togglePause();
 	if(lives>0) {
+		generateMap(2);
 		u.x=wi/2;u.y=he-1;
 	}
 	else {
