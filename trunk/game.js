@@ -9,8 +9,8 @@ c.style.border="red 1px solid";
 w=window;
 o=[]; // enemies
 m=[]; // gaming field
+u=0;
 level=1;
-lives=3;
 timer="";
 Mro=Math.round;
 Mra=Math.random;
@@ -100,14 +100,14 @@ function moveUser()
 		t = getAreaType(u.x+x, u.y+y);
 		if (t==3) gameOver();
 		if (t) {
-			(getAreaType(u.x+x, u.y+y)==2)?u.l=1:0;
+			(getAreaType(u.x+x, u.y+y)==2)?u.m=1:0;
 			changeObjectPosition(u,u.x+x,u.y+y);
 		} else {
-			u.l=u.v=0;
+			u.m=u.v=0;
 		}
 	}
-	if(u.l && getAreaType(u.x, u.y)==1) {
-		u.v=u.l=0;
+	if(u.m && getAreaType(u.x, u.y)==1) {
+		u.v=u.m=0;
 		fillMap();
 	}
 }
@@ -212,7 +212,7 @@ function changeObjectPosition(o,x2,y2){
 }
 
 function togglePause(){
-	if (!timer  && lives){
+	if (!timer  && u.l){
 		generateMap(2);
 		timer = setInterval(function(){
 			moveUser();
@@ -229,12 +229,14 @@ function togglePause(){
 function generateMap(a) {
 	(a==0)?f=0:0;
 	if(a>0) {
+		(!u || a==1)?
 		u = { // user
 			t:0,
 			c:4,
 			x:wi/2,
-			y:he-2
-		};
+			y:he-2,
+			l:3
+		}:0;
 
 		changeObjectPosition(u, u.x, u.y)
 		for(var i in o) {
@@ -267,18 +269,16 @@ function generateMap(a) {
 				m[i]=2;
 				drawBlock(x, y, 2);
 			}
+			u.x=wi/2;u.y=he-2;
 		}
 	}
 	return (a==0)?f:0;
 }
 
 function gameOver() {
-	lives--;
+	u.l--;
 	togglePause();
-	if(lives>0) {
-		u.x=wi/2;u.y=he-1;
-	}
-	else {
+	if(u.l<1) {
 		a[_fs]="red";
 		a[_fr](0,0,wi*s,he*s);
 		a[_fs]="white";
