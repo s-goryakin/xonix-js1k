@@ -44,22 +44,8 @@ function startLevel()
 	m=[];
 	o=[];
 	generateMap(1);
-	u = { // user
-		t:0,
-		c:4,
-		x:wi/2,
-		y:he-2
-	};
-
 	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level+1);
-//	createObjects(2, level);
-
-	changeObjectPosition(u, u.x, u.y)
-	for(var i in o) {
-		t=o[i];
-		changeObjectPosition(t, t.x, t.y);
-	}
 }
 
 // initialize game object and store it in the objects array
@@ -227,6 +213,7 @@ function changeObjectPosition(o,x2,y2){
 
 function togglePause(){
 	if (!timer  && lives){
+		generateMap(2);
 		timer = setInterval(function(){
 			moveUser();
 			for(var a in o) {
@@ -241,6 +228,20 @@ function togglePause(){
 
 function generateMap(a) {
 	(a==0)?f=0:0;
+	if(a>0) {
+		u = { // user
+			t:0,
+			c:4,
+			x:wi/2,
+			y:he-2
+		};
+
+		changeObjectPosition(u, u.x, u.y)
+		for(var i in o) {
+			t=o[i];
+			changeObjectPosition(t, t.x, t.y);
+		}
+	}
 	for(i=wi*he-1;i>=0;i--){
 		x=i%wi;
 		y=parseInt(i/wi);
@@ -275,7 +276,6 @@ function gameOver() {
 	lives--;
 	togglePause();
 	if(lives>0) {
-		generateMap(2);
 		u.x=wi/2;u.y=he-1;
 	}
 	else {
