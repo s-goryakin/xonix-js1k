@@ -297,7 +297,7 @@ function drawBlock(k, color)
 		2:'03f',
 		3:'red',
 		4:'390',
-		5:'ffo',
+		5:'ff0',
 		9:'fff'
 	};
 	
