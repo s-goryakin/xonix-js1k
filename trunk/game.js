@@ -75,10 +75,8 @@ function startLevel()
 	createObjects(2, level+1);
 
 	changeObjectPosition(u, u.k)
-	for(var i in o) {
-		t=o[i];
-		changeObjectPosition(t, t.k);
-	}
+	for(var i in o)
+		changeObjectPosition(o[i], o[i].k);
 }
 
 // initialize game object and store it in the objects array
@@ -87,11 +85,12 @@ function createObjects(type, count)
 	for(i=0;i<count;i++)
 	{
 		// vectors: 1 - left-up, 2 - right-up, 3 - right-down, 4 - left-down
+		while (m[n = Mro(Mra() * wi * he)] != type); // getting random coordinates
 		o.push({
 			t:type,
 			c:3,
-			v: Mro(Mra() * 4),
-			k:getRandCoords(type)
+			v:Mro(Mra() * 4), // getting random vector
+			k:n
 		});
 	}
 }
@@ -157,29 +156,21 @@ function createNewEnemyVector(t)
 		t.v = invertY[invertX[v]];
 }
 
-// Used only for start level
-function getRandCoords(type)
-{
-	while (m[n = Mro(Mra() * wi * he)] != type);
-	return n;
-}
-
 // draw object at new coordinates and delete it from old coordinates
 function changeObjectPosition(t, k2)
 {
 	// Delete old item first
 	z = t.k;
-	//console.log(z);
-	if ((!t.t && m[z] == 2) || (m[z] == 3))
+	if ((!t.t && m[z] == 2) || m[z] == 3)
 	{
-		c = 5;
+		prev_color = 5;
 		m[z] = 3;
 	}
 	else
 	{
-		c = m[z] == 1 ? 1 : 2;
+		prev_color = m[z] == 1 ? 1 : 2;
 	}
-	drawBlock(t.k, c);
+	drawBlock(t.k, prev_color);
 	// Draw new item
 	
 	drawBlock(k2, t.c);
@@ -247,7 +238,6 @@ function gameOver() {
 	lives--;
 	togglePause();
 	if(lives>0) {
-		u.k = user_start;
 		changeObjectPosition(u, user_start);
 	}
 	else {
@@ -292,8 +282,8 @@ function nextLevel() {
 	startLevel(level++);
 }
 
-function drawBlock(k, c){
-
+function drawBlock(k, color)
+{
 	// black -- border -- 000000 (000) -- #0
 	// gray -- land -- 999999 (999) -- #1
 	// blue -- water -- 0033ff (03f) -- #2
@@ -310,19 +300,13 @@ function drawBlock(k, c){
 		5:'ffo',
 		9:'fff'
 	};
-	a[_fs] = colors[parseInt(c)];
+	
+	a[_fs] = "#"+colors[parseInt(color)];
 
-	coords = getCoordsByK(k);
-	a[_fr](coords.x*s,coords.y*s,s,s);
-}
-
-function getCoordsByK(k)
-{
-	// probably we don't need to check X to be zero. it's border there and we don't need to draw border actually
 	var x, y;
-	x = k % wi ? k % wi : wi;
+	x = k % wi ? k % wi : wi; // probably we don't need to check X to be zero. it's border there and we don't need to draw border actually
 	y = parseInt((k-1) / wi);
-	return {x:x-1,y:y};
+	a[_fr]((x-1)*s,y*s,s,s);
 }
 
 w.onload = function(){
@@ -331,7 +315,6 @@ w.onload = function(){
 
 		// we need to change vector or user object here
 		kc=e.keyCode
-		console.log(kc);
 		if (36<kc && kc<41)
 			u.v = kc-36;
 
