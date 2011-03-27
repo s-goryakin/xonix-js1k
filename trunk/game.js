@@ -1,27 +1,48 @@
 wi=70;
 he=40;
-//wi=10;
-//he=5;
+//wi=11;
+//he=10;
 s=10;
 c.width=wi*s;
 c.height=he*s;
-c.style.border="red 1px solid";
+//c.style.border="red 1px solid";
 w=window;
-o=[]; // enemies
-m=[]; // gaming field
-u=0;
 level=1;
+lives=3;
 timer="";
 Mro=Math.round;
 Mra=Math.random;
 _fs="fillStyle";
 _fr="fillRect";
-//TODO: colors
-// blue -- water -- 0033ff (03f) -- #2
-// gray -- land -- 999999 (999) -- #1
-// green -- player -- 339900 (390) --#4
-// red -- AI -- ff0000 (f00) -- #3
-// yellow -- path	-- ffff00 (ff0) --5
+user_start = parseInt(wi*he-wi*2.5);
+
+// arrays co invert enemies vectors
+invertX = {
+	1:2,
+	2:1,
+	3:4,
+	4:3
+};
+invertY = {
+	1:4,
+	4:1,
+	2:3,
+	3:2
+};
+
+// arrays to convert vectors to coefficients
+v2kx = {
+	1:-1,
+	2:1,
+	3:1,
+	4:-1
+};
+v2ky = {
+	1:-1,
+	2:-1,
+	3:1,
+	4:1
+};
 
 /*
 Object description:
@@ -44,8 +65,20 @@ function startLevel()
 	m=[];
 	o=[];
 	generateMap(1);
+	u = { // user
+		t:0,
+		c:4,
+		k:user_start
+	};
+
 	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level+1);
+
+	changeObjectPosition(u, u.k)
+	for(var i in o) {
+		t=o[i];
+		changeObjectPosition(t, t.k);
+	}
 }
 
 // initialize game object and store it in the objects array
@@ -53,61 +86,39 @@ function createObjects(type, count)
 {
 	for(i=0;i<count;i++)
 	{
-		v = Mro(Mra() * 3) + 5;
-		coords = getRandCoords(type);
+		// vectors: 1 - left-up, 2 - right-up, 3 - right-down, 4 - left-down
 		o.push({
 			t:type,
 			c:3,
-			v:v>6?v+2:v,
-			x:coords.x,
-			y:coords.y
+			v: Mro(Mra() * 4),
+			k:getRandCoords(type)
 		});
 	}
 }
 
-// return the type of surface for specified coordinates
-function getAreaType(x,y){
-	// check current matrix here
-
-	/// todo: add all other types
-	if (x < 0 || y < 0 || x >= wi || y >= he)
-		return 0;
-	else
-	{
-//		console.log(typeof m[x]);
-//		if (typeof m[x] == "undefined" || typeof m[x][y] == "undefined")
-//			console.log("Trying to get area type ");
-//		if (typeof x == "undefined" || typeof y == "undefined")
-//			console.log("Trying to get area type ");
-		return m[y*wi+x];
-	}
-}
-
-function enemyCanBeHere(x, y, type)
+function enemyCanBeHere(k, type)
 {
-	if (type == 1)
-		return getAreaType(x, y) == 1;
-
-	return !(getAreaType(x, y) == 1);
+	return (type == 1) ? (m[k] == 1) : !(m[k] == 1);
 }
 
 function moveUser()
 {
-	if (u.v)
+	var v = u.v;
+	if (v)
 	{
-		x=!((u.v-1)*(u.v-3))?u.v-2:0;
-		y=!((u.v-2)*(u.v-4))?u.v-3:0;
-		t = getAreaType(u.x+x, u.y+y);
-		if (t==3) gameOver();
-		if (t) {
-			(getAreaType(u.x+x, u.y+y)==2)?u.m=1:0;
-			changeObjectPosition(u,u.x+x,u.y+y);
-		} else {
-			u.m=u.v=0;
-		}
+		// 0 - stop, 1 - left, 2 - up, 3 - right, 4 - down
+		var k = u.k + ((v-1) * (v-3) ? (v - 3) * wi : v - 2);
+
+		if (m[k] == 3) gameOver();
+		if (m[k] == 2) u.l = 1;
+		if (m[k])
+			changeObjectPosition(u, k);
+		else
+			u.l = u.v = 0;
 	}
-	if(u.m && getAreaType(u.x, u.y)==1) {
-		u.v=u.m=0;
+	if(u.l && m[u.k] == 1)
+	{
+		u.v = u.l = 0;
 		fillMap();
 	}
 }
@@ -116,86 +127,50 @@ function moveEnemy(t)
 {
 	createNewEnemyVector(t);
 
-	kx = getKX(t);
-	ky = getKY(t);
+	k = v2kx[t.v] + v2ky[t.v]*wi;
 
-	if (enemyCanBeHere(t.x+kx, t.y+ky, t.t))
-		changeObjectPosition(t, t.x+kx, t.y+ky);
+	if (enemyCanBeHere(t.k+k, t.t))
+		changeObjectPosition(t, t.k+k);
 
 	checkGameOver(t);
 }
 
 function checkGameOver(t)
 {
-	if (t.x == u.x && t.y == u.y || getAreaType(t.x, t.y) == 3)
+	if (t.k == u.k || m[t.k] == 3)
 		gameOver();
 }
 
 function createNewEnemyVector(t)
 {
-	kx = getKX(t);
-	ky = getKY(t);
 	v = t.v;
+	kx = v2kx[v];
+	ky = v2ky[v];
 
-	if (!enemyCanBeHere(t.x+kx, t.y, t.t))
-		invertX(t);
+	if (!enemyCanBeHere(t.k+kx, t.t))
+		t.v = invertX[v];
 
-	if (!enemyCanBeHere(t.x, t.y+ky, t.t))
-		invertY(t);
+	if (!enemyCanBeHere(t.k+ky*wi, t.t))
+		t.v = invertY[v];
 
-	if (v == t.v && !enemyCanBeHere(t.x+kx, t.y+ky, t.t)) // we need to check if we already changed the vector
-	{
-		invertX(t);
-		invertY(t);
-	}
-
-	return;
+	if (v == t.v && !enemyCanBeHere(t.k+kx+ky*wi, t.t)) // we need to check if we already changed the vector
+		t.v = invertY[invertX[v]];
 }
-
-function getKY(t)
-{
-	return (t.v & 4) / 4 - (t.v & 8) / 8;
-}
-function getKX(t)
-{
-	return (t.v & 1) / 1 - (t.v & 2) / 2;
-}
-
-function invertX(t)
-{
-	var y = (t.v & 4) + (t.v & 8);
-	t.v = y + !(t.v&1)*1 + !(t.v&2)*2;
-}
-function invertY(t)
-{
-	var x = (t.v & 1) + (t.v & 2);
-	t.v = x + !(t.v&4)*4 + !(t.v&8)*8;
-}
-
-function changeEnemyVector(o,inv){
-	if (inv.x)
-		o.v = 8 - (o.v+1)%4;
-	if (inv.y)
-		o.v = 13 - o.v;
-}
-
 
 // Used only for start level
-function getRandCoords(type){
-
-	do {
-		n = {x:Mro(Mra()*wi),y:Mro(Mra()*he)}
-	} while (getAreaType(n.x, n.y) != type);
-
+function getRandCoords(type)
+{
+	while (m[n = Mro(Mra() * wi * he)] != type);
 	return n;
 }
 
 // draw object at new coordinates and delete it from old coordinates
-function changeObjectPosition(o,x2,y2){
+function changeObjectPosition(t, k2)
+{
 	// Delete old item first
-	z=o.y*wi+o.x;
+	z = t.k;
 	//console.log(z);
-	if ((!o.t && m[z] == 2) || (m[z] == 3))
+	if ((!t.t && m[z] == 2) || (m[z] == 3))
 	{
 		c = 5;
 		m[z] = 3;
@@ -204,16 +179,15 @@ function changeObjectPosition(o,x2,y2){
 	{
 		c = m[z] == 1 ? 1 : 2;
 	}
-	drawBlock(o.x, o.y, c);
+	drawBlock(t.k, c);
 	// Draw new item
-	drawBlock(x2, y2, o.c);
-	o.x = x2;
-	o.y = y2;
+	
+	drawBlock(k2, t.c);
+	t.k = k2;
 }
 
 function togglePause(){
-	if (!timer  && u.l){
-		generateMap(2);
+	if (!timer  && lives){
 		timer = setInterval(function(){
 			moveUser();
 			for(var a in o) {
@@ -227,58 +201,56 @@ function togglePause(){
 }
 
 function generateMap(a) {
-	(a==0)?f=0:0;
-	if(a>0) {
-		(!u || a==1)?
-		u = { // user
-			t:0,
-			c:4,
-			x:wi/2,
-			y:he-2,
-			l:3
-		}:0;
+	(!a)?f=0:0;
 
-		changeObjectPosition(u, u.x, u.y)
-		for(var i in o) {
-			t=o[i];
-			changeObjectPosition(t, t.x, t.y);
+	var b = 4;
+
+	for(i = 1; i <= wi * he; i++)
+	{
+		if (a)
+		{
+			var y = parseInt((i-1) / wi) + 1;
+
+			var k = 2; // sea
+
+			if (i % wi > 0 && i % wi < b) // land
+				k = 1;
+			if (wi - (i-1) % wi > 0 && wi - (i-1) % wi < b) // land
+				k = 1;
+			if (y < b || y - 1 > he - b) // land
+				k = 1;
+
+			if (i % wi == 0 || i % wi == 1 || y == 1 || y == he) // border
+				k = 0;
+			
+			m[i] = k;
+			drawBlock(i,k);
 		}
-	}
-	for(i=wi*he-1;i>=0;i--){
-		x=i%wi;
-		y=parseInt(i/wi);
-		if (a==1) {
-			k=2;
-			if(y<2||y>he-3||x<2||x>wi-3) k=1;
-			m.push(k);
-			drawBlock(x,y,k);
-		}
-		if(a==0) {
+		else if (a == 0)
+		{
 			if (m[i] > 1 && m[i] < 4)
 			{
 				m[i] = 1;
-				drawBlock(x, y, 1);
+				drawBlock(i, 1);
 			}
-			if (m[i]==9) {
+			if (m[i] == 9)
+			{
 				f++;
 				m[i] = 2;
 			}
 		}
-		if(a==2) {
-			if(m[i]!=1) {
-				m[i]=2;
-				drawBlock(x, y, 2);
-			}
-			u.x=wi/2;u.y=he-2;
-		}
 	}
-	return (a==0)?f:0;
+	return (!a)?f:0;
 }
 
 function gameOver() {
-	u.l--;
+	lives--;
 	togglePause();
-	if(u.l<1) {
+	if(lives>0) {
+		u.k = user_start;
+		changeObjectPosition(u, user_start);
+	}
+	else {
 		a[_fs]="red";
 		a[_fr](0,0,wi*s,he*s);
 		a[_fs]="white";
@@ -320,10 +292,37 @@ function nextLevel() {
 	startLevel(level++);
 }
 
-function drawBlock(x,y,c){
-//	a.fillStyle=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":"#ff0")));
-	a[_fs]=(c==1)?"#999":((c==2)?"#03f":((c==3)?"red":((c==4)?"#390":((c==9)?"#fff":"#ff0"))));
-	a[_fr](x*s,y*s,s,s);
+function drawBlock(k, c){
+
+	// black -- border -- 000000 (000) -- #0
+	// gray -- land -- 999999 (999) -- #1
+	// blue -- water -- 0033ff (03f) -- #2
+	// yellow -- path	-- ffff00 (ff0) --5
+	// green -- player -- 339900 (390) --#4
+	// red -- AI -- ff0000 (f00) -- #3
+
+	colors = {
+		0:'000',
+		1:'999',
+		2:'03f',
+		3:'red',
+		4:'390',
+		5:'ffo',
+		9:'fff'
+	};
+	a[_fs] = colors[parseInt(c)];
+
+	coords = getCoordsByK(k);
+	a[_fr](coords.x*s,coords.y*s,s,s);
+}
+
+function getCoordsByK(k)
+{
+	// probably we don't need to check X to be zero. it's border there and we don't need to draw border actually
+	var x, y;
+	x = k % wi ? k % wi : wi;
+	y = parseInt((k-1) / wi);
+	return {x:x-1,y:y};
 }
 
 w.onload = function(){
