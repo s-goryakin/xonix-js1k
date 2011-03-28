@@ -194,26 +194,12 @@ function togglePause(){
 function generateMap(a) {
 	(!a)?f=0:0;
 
-	var b = 4;
-
 	for(i = 1; i <= wi * he; i++)
 	{
 		if (a)
 		{
-			var y = parseInt((i-1) / wi) + 1;
-
-			var k = 2; // sea
-
-			if (i % wi > 0 && i % wi < b) // land
-				k = 1;
-			if (wi - (i-1) % wi > 0 && wi - (i-1) % wi < b) // land
-				k = 1;
-			if (y < b || y - 1 > he - b) // land
-				k = 1;
-
-			if (i % wi == 0 || i % wi == 1 || y == 1 || y == he) // border
-				k = 0;
-			
+			var d = getMinDistance2Border(i);
+			var k = d > 3 ? 2 : d > 1 ? 1 : 0;
 			m[i] = k;
 			drawBlock(i,k);
 		}
@@ -232,6 +218,17 @@ function generateMap(a) {
 		}
 	}
 	return (!a)?f:0;
+}
+
+function getMinDistance2Border(k)
+{
+	var y = parseInt((k-1) / wi);
+	y = Math.min(he-y, y+1);
+
+	var x = k % wi;
+	x = Math.min(x, wi+1-x);
+
+	return Math.min(x,y);
 }
 
 function gameOver() {
