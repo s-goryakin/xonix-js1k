@@ -18,30 +18,30 @@ user_start = parseInt(wi*he-wi*2.5);
 
 // arrays co invert enemies vectors
 invertX = {
-	1:2,
-	2:1,
-	3:4,
-	4:3
-};
-invertY = {
-	1:4,
-	4:1,
+	0:1,
+	1:0,
 	2:3,
 	3:2
+};
+invertY = {
+	0:3,
+	3:0,
+	1:2,
+	2:1
 };
 
 // arrays to convert vectors to coefficients
 v2kx = {
-	1:-1,
+	0:-1,
+	1:1,
 	2:1,
-	3:1,
-	4:-1
+	3:-1
 };
 v2ky = {
+	0:-1,
 	1:-1,
-	2:-1,
-	3:1,
-	4:1
+	2:1,
+	3:1
 };
 
 /*
@@ -73,7 +73,7 @@ function startLevel()
 
 	createObjects(1, (level>7?7:level)); // max land enemies count is 7
 	createObjects(2, level+1);
-
+	
 	changeObjectPosition(u, u.k)
 	for(var i in o)
 		changeObjectPosition(o[i], o[i].k);
@@ -89,7 +89,7 @@ function createObjects(type, count)
 		o.push({
 			t:type,
 			c:3,
-			v:Mro(Mra() * 4), // getting random vector
+			v:(Mro(Mra() * 3)), // getting random vector
 			k:n
 		});
 	}
