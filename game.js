@@ -1,20 +1,40 @@
-wi=70;
-he=40;
-//wi=11;
-//he=10;
-s=10;
-c.width=wi*s;
-c.height=he*s;
-//c.style.border="red 1px solid";
+// a; // reserved
+// b; // reserved
+// c; // reserved
 w=window;
+
+W=70; // main width
+H=40; // main height
+B=10; // block size
+
+// M; // map field
+// E; // enemies
+// U; // user
+// P; // user start position
+
+r=Math.random; // alias
+R=Math.round; // alias
+m=Math.min; // alias
+I=parseInt; // alias
+
+// i, j; // universal iterators
+// k, x, y; // universal map indexes
+// v; // universal vector
+
 level=1;
 lives=3;
 timer="";
-Mro=Math.round;
-Mra=Math.random;
+
 _fs="fillStyle";
 _fr="fillRect";
-user_start = parseInt(wi*he-wi*2.5);
+
+//W=11;
+//H=10;
+
+c.width=W*B;
+c.height=H*B;
+
+P = I(W*H-W*2.5);
 
 // arrays co invert enemies vectors
 invertX = {
@@ -31,13 +51,13 @@ invertY = {
 };
 
 // arrays to convert vectors to coefficients
-v2kx = {
+v2x = {
 	0:-1,
 	1:1,
 	2:1,
 	3:-1
 };
-v2ky = {
+v2y = {
 	0:-1,
 	1:-1,
 	2:1,
@@ -46,12 +66,11 @@ v2ky = {
 
 /*
 Object description:
-o = {
+enemies = {
 	t:type, // 0 - user, 1 - land, 2 - sea
 	c:color, // #390 - user, #f00 - AI
 	v:vector, // 0 - stop, 1 - left, 2 - up, 3 - right, 4 - down, 5 - left-up, 6 - up-right, 7 - right-down, 8 - down-left
-	x:x, // x-coordinate
-	y:y // y-coordinate
+	k:k, // map index
 };
 area (surface) description:
 0 - outer space :)
@@ -62,63 +81,58 @@ area (surface) description:
 // process all routine for starting level
 function startLevel()
 {
-	m=[];
-	o=[];
+	M=[];
+	E=[];
 	generateMap(1);
-	u = { // user
+	U = { // user
 		t:0,
 		c:4,
-		k:user_start
+		k:P
 	};
 
-	createObjects(1, (level>7?7:level)); // max land enemies count is 7
+	createObjects(1, (level>5?5:level)); // max land enemies count is 5
 	createObjects(2, level+1);
 	
-	changeObjectPosition(u, u.k)
-	for(var i in o)
-		changeObjectPosition(o[i], o[i].k);
+	changeObjectPosition(U, U.k)
+	for(i in E)
+		changeObjectPosition(E[i], E[i].k);
 }
 
 // initialize game object and store it in the objects array
 function createObjects(type, count)
 {
-	for(i=0;i<count;i++)
+	i = count;
+	while (i--)
 	{
 		// vectors: 1 - left-up, 2 - right-up, 3 - right-down, 4 - left-down
-		while (m[n = Mro(Mra() * wi * he)] != type); // getting random coordinates
-		o.push({
+		while (M[k = R(r() * W * H)] != type); // getting random coordinates
+		E.push({
 			t:type,
 			c:3,
-			v:(Mro(Mra() * 3)), // getting random vector
-			k:n
+			v:R(r() * 3), // getting random vector
+			k:k
 		});
 	}
 }
 
-function enemyCanBeHere(k, type)
+function enemyCanBeHere(index, type)
 {
-	return !((type==1)^(m[k]==1));
+	return !((type==1)^(M[index]==1));
 }
 
 function moveUser()
 {
-	var v = u.v;
+	v = U.v;
 	if (v)
 	{
 		// 0 - stop, 1 - left, 2 - up, 3 - right, 4 - down
-		var k = u.k + ((v-1) * (v-3) ? (v - 3) * wi : v - 2);
+		k = U.k + ((v-1) * (v-3) ? (v - 3) * W : v - 2);
 
-		if (m[k] == 3) gameOver();
-		if (m[k] == 2) u.l = 1;
-		if (m[k])
-			changeObjectPosition(u, k);
+		if (M[k] == 3) gameOver();
+		if (M[k])
+			changeObjectPosition(U, k);
 		else
-			u.l = u.v = 0;
-	}
-	if(u.l && m[u.k] == 1)
-	{
-		u.v = u.l = 0;
-		fillMap();
+			U.v = 0;
 	}
 }
 
@@ -126,7 +140,7 @@ function moveEnemy(t)
 {
 	createNewEnemyVector(t);
 
-	k = v2kx[t.v] + v2ky[t.v]*wi;
+	k = v2x[t.v] + v2y[t.v]*W;
 
 	if (enemyCanBeHere(t.k+k, t.t))
 		changeObjectPosition(t, t.k+k);
@@ -136,23 +150,23 @@ function moveEnemy(t)
 
 function checkGameOver(t)
 {
-	if (t.k == u.k || m[t.k] == 3)
+	if (t.k == U.k || M[t.k] == 3)
 		gameOver();
 }
 
 function createNewEnemyVector(t)
 {
 	v = t.v;
-	kx = v2kx[v];
-	ky = v2ky[v]*wi;
+	x = v2x[v];
+	y = v2y[v]*W;
 
-	if (!enemyCanBeHere(t.k+kx, t.t))
+	if (!enemyCanBeHere(t.k+x, t.t))
 		t.v = invertX[v];
 
-	if (!enemyCanBeHere(t.k+ky, t.t))
+	if (!enemyCanBeHere(t.k+y, t.t))
 		t.v = invertY[v];
 
-	if (v == t.v && !enemyCanBeHere(t.k+kx+ky, t.t)) // we need to check if we already changed the vector
+	if (v == t.v && !enemyCanBeHere(t.k+x+y, t.t)) // we need to check if we already changed the vector
 		t.v = invertY[invertX[v]];
 }
 
@@ -160,19 +174,26 @@ function createNewEnemyVector(t)
 function changeObjectPosition(t, k2)
 {
 	// Delete old item first
-	z = t.k;
-	if ((!t.t && m[z] == 2) || m[z] == 3)
+	k = t.k;
+	if ((!t.t && M[k] == 2) || M[k] == 3)
 	{
 		prev_color = 5;
-		m[z] = 3;
+		M[k] = 3;
 	}
 	else
 	{
-		prev_color = m[z] == 1 ? 1 : 2;
+		prev_color = M[k] == 1 ? 1 : 2;
 	}
 	drawBlock(t.k, prev_color);
+
+	// Check if we moving user and crossing sea-land border
+	if (!t.t && M[t.k] == 3 * M[k2])
+	{
+		U.v = 0;
+		fillMap();
+	}
+
 	// Draw new item
-	
 	drawBlock(k2, t.c);
 	t.k = k2;
 }
@@ -181,8 +202,8 @@ function togglePause(){
 	if (!timer  && lives){
 		timer = setInterval(function(){
 			moveUser();
-			for(var a in o) {
-				moveEnemy(o[a]);
+			for(i in E) {
+				moveEnemy(E[i]);
 			}
 		}, 50);
 	}else{
@@ -191,84 +212,87 @@ function togglePause(){
 	}
 }
 
-function generateMap(a) {
-	f=0;
-	for(i = 1; i <= wi * he; i++)
+function generateMap(redraw) {
+	sea_area = 0;
+	i = W * H + 1;
+	while (i--)
 	{
-		if (a)
+		if (redraw)
 		{
-			var d = getMinDistance2Border(i);
-			var k = d > 3 ? 2 : d > 1 ? 1 : 0;
-			drawBlock(i,m[i] = k);
+			j = getMinDistance2Border(i);
+			k = j > 3 ? 2 : j > 1 ? 1 : 0;
+			drawBlock(i, M[i] = k);
 		}
 		else
 		{
-			if (m[i] > 1 && m[i] < 4)
-				drawBlock(i, m[i] = 1);
+			if (M[i] > 1 && M[i] < 4)
+				drawBlock(i, M[i] = 1);
 			
-			if (m[i] == 9)
+			if (M[i] == 9)
 			{
-				f++;
-				m[i] = 2;
+				sea_area++;
+				M[i] = 2;
 			}
 		}
 	}
-	return f;
+	return sea_area;
 }
 
-function getMinDistance2Border(k)
+function getMinDistance2Border(index)
 {
-	var y = parseInt((k-1) / wi);
-	y = Math.min(he-y, y+1);
+	y = I((index-1) / W);
+	y = m(H-y, y+1);
 
-	var x = k % wi;
-	x = Math.min(x, wi+1-x);
+	x = index % W;
+	x = m(x, W+1-x);
 
-	return Math.min(x,y);
+	return m(x,y);
 }
 
 function gameOver() {
 	lives--;
 	togglePause();
 	if(lives>0) {
-		changeObjectPosition(u, user_start);
+		changeObjectPosition(U, P);
 	}
 	else {
 		a[_fs]="red";
-		a[_fr](0,0,wi*s,he*s);
+		a[_fr](0,0,W*B,H*B);
 		a[_fs]="white";
 		a.font = "25px Arial";
-		a.fillText("You have died of dysentery", ((wi-25)/2*s), (he/2*s));
+		a.fillText("You have died of dysentery", ((W-25)/2*B), (H/2*B));
 	}
 }
 
 function fillMap() {
-	for(var a in o) {
-		if(o[a].t<2)
+	for(i in E) {
+		
+		if(E[i].t < 2)
 			continue;
 
-		tmp_array = [o[a].k];
+		tmp_array = [E[i].k];
 		while(tmp_array.length > 0)
 		{
 			k = tmp_array.shift();
-			if (m[k])
+			if (M[k])
 			{
-				near = [k-1, k+1, k-wi, k+wi];
-				for (i in near)
+				near = [k-1, k+1, k-W, k+W];
+				for (j in near)
 				{
-					z=near[i];
-					if (m[z] == 2)
+					z=near[j];
+					if (M[z] == 2)
 					{
 						tmp_array.push(z);
-						m[z]=9;
+						M[z]=9;
 					}
 				}
 			}
 		}
 	}
-	a=(wi-6)*(he-6);
-	f=generateMap(0);
-	if (15 >= parseInt(f/a*100))
+
+	sea_area = generateMap(0);
+	whole_sea = (W-6)*(H-6);
+	if ((sea_area / whole_sea) < 0.15)
 		nextLevel();
 }
 
@@ -277,7 +301,7 @@ function nextLevel() {
 	startLevel(level++);
 }
 
-function drawBlock(k, color)
+function drawBlock(index, color)
 {
 	// black -- border -- 000000 (000) -- #0
 	// gray -- land -- 999999 (999) -- #1
@@ -296,12 +320,11 @@ function drawBlock(k, color)
 		9:'fff'
 	};
 	
-	a[_fs] = "#"+colors[parseInt(color)];
+	a[_fs] = "#"+colors[I(color)];
 
-	var x, y;
-	x = k % wi ? k % wi : wi; // probably we don't need to check X to be zero. it's border there and we don't need to draw border actually
-	y = parseInt((k-1) / wi);
-	a[_fr]((x-1)*s,y*s,s,s);
+	x = index % W ? index % W : W; // probably we don't need to check X to be zero. it's border there and we don't need to draw border actually
+	y = I((index-1) / W);
+	a[_fr]((x-1)*B,y*B,B,B);
 }
 
 w.onload = function(){
@@ -311,7 +334,7 @@ w.onload = function(){
 		// we need to change vector or user object here
 		kc=e.keyCode
 		if (36<kc && kc<41)
-			u.v = kc-36;
+			U.v = kc-36;
 
 		if (kc == 80 || kc == 32) // "P" or "Space"
 			togglePause();
