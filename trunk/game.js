@@ -251,30 +251,32 @@ function gameOver() {
 
 function fillMap() {
 	for(var a in o) {
-		if(o[a].t<2)continue;
-		tmp_array = [];
-		tmp_array.push({x: o[a].x, y: o[a].y});
-		while(tmp_array.length > 0) {
-			tmp_el = tmp_array.shift();
-			x=tmp_el.x;
-			y=tmp_el.y;
-			if (x-1 && x <= wi && y-1 && y <= he) {
-				coords = [{x: x-1, y: y}, {x: x+1, y: y}, {x: x, y: y-1}, {x: x, y: y+1}];
-				for (i in coords)
+		if(o[a].t<2)
+			continue;
+
+		tmp_array = [o[a].k];
+		while(tmp_array.length > 0)
+		{
+			k = tmp_array.shift();
+			if (m[k])
+			{
+				near = [k-1, k+1, k-wi, k+wi];
+				for (i in near)
 				{
-					z=coords[i].y*wi+coords[i].x;
-					if (m[z] == 2) {
-						tmp_array.push({x: coords[i].x, y: coords[i].y});
+					z=near[i];
+					if (m[z] == 2)
+					{
+						tmp_array.push(z);
 						m[z]=9;
 					}
 				}
 			}
 		}
 	}
-	a=(wi-4)*(he-4);
+	a=(wi-6)*(he-6);
 	f=generateMap(0);
-	b=100-parseInt(f/a*100);
-	(b>86)?nextLevel():0;
+	if (15 >= parseInt(f/a*100))
+		nextLevel();
 }
 
 function nextLevel() {
