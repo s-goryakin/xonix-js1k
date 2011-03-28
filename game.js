@@ -200,16 +200,13 @@ function generateMap(a) {
 		{
 			var d = getMinDistance2Border(i);
 			var k = d > 3 ? 2 : d > 1 ? 1 : 0;
-			m[i] = k;
-			drawBlock(i,k);
+			drawBlock(i,m[i] = k);
 		}
 		else if (a == 0)
 		{
 			if (m[i] > 1 && m[i] < 4)
-			{
-				m[i] = 1;
-				drawBlock(i, 1);
-			}
+				drawBlock(i, m[i] = 1);
+			
 			if (m[i] == 9)
 			{
 				f++;
