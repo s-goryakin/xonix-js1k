@@ -297,7 +297,7 @@ function drawBlock(k, color)
 		0:'000',
 		1:'999',
 		2:'03f',
-		3:'red',
+		3:'f00',
 		4:'390',
 		5:'ff0',
 		9:'fff'
