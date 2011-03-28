@@ -12,9 +12,10 @@ B=10; // block size
 // U; // user
 // P; // user start position
 
-r=Math.random; // alias
-R=Math.round; // alias
-m=Math.min; // alias
+D=Math; // alias
+r=D.random; // alias
+R=D.round; // alias
+m=D.min; // alias
 I=parseInt; // alias
 
 // i, j; // universal iterators
@@ -108,7 +109,7 @@ function createObjects(type, count)
 		while (M[k = R(r() * W * H)] != type); // getting random coordinates
 		E.push({
 			t:type,
-			c:3,
+			c:5,
 			v:R(r() * 3), // getting random vector
 			k:k
 		});
@@ -175,15 +176,10 @@ function changeObjectPosition(t, k2)
 {
 	// Delete old item first
 	k = t.k;
-	if ((!t.t && M[k] == 2) || M[k] == 3)
-	{
-		prev_color = 5;
-		M[k] = 3;
-	}
-	else
-	{
-		prev_color = M[k] == 1 ? 1 : 2;
-	}
+	
+	prev_color = M[k];
+	if (!t.t && M[k] == 2)
+		prev_color = M[k] = 3;
 	drawBlock(t.k, prev_color);
 
 	// Check if we moving user and crossing sea-land border
@@ -306,17 +302,17 @@ function drawBlock(index, color)
 	// black -- border -- 000000 (000) -- #0
 	// gray -- land -- 999999 (999) -- #1
 	// blue -- water -- 0033ff (03f) -- #2
-	// yellow -- path	-- ffff00 (ff0) --5
+	// yellow -- path	-- ffff00 (ff0) --3
 	// green -- player -- 339900 (390) --#4
-	// red -- AI -- ff0000 (f00) -- #3
+	// red -- AI -- ff0000 (f00) -- #5
 
 	colors = {
 		0:'000',
 		1:'999',
 		2:'03f',
-		3:'f00',
+		3:'ff0',
 		4:'390',
-		5:'ff0',
+		5:'f00',
 		9:'fff'
 	};
 	
