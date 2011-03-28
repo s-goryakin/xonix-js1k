@@ -97,7 +97,7 @@ function createObjects(type, count)
 
 function enemyCanBeHere(k, type)
 {
-	return (type == 1) ? (m[k] == 1) : !(m[k] == 1);
+	return !((type==1)^(m[k]==1));
 }
 
 function moveUser()
@@ -144,15 +144,15 @@ function createNewEnemyVector(t)
 {
 	v = t.v;
 	kx = v2kx[v];
-	ky = v2ky[v];
+	ky = v2ky[v]*wi;
 
 	if (!enemyCanBeHere(t.k+kx, t.t))
 		t.v = invertX[v];
 
-	if (!enemyCanBeHere(t.k+ky*wi, t.t))
+	if (!enemyCanBeHere(t.k+ky, t.t))
 		t.v = invertY[v];
 
-	if (v == t.v && !enemyCanBeHere(t.k+kx+ky*wi, t.t)) // we need to check if we already changed the vector
+	if (v == t.v && !enemyCanBeHere(t.k+kx+ky, t.t)) // we need to check if we already changed the vector
 		t.v = invertY[invertX[v]];
 }
 
@@ -192,8 +192,7 @@ function togglePause(){
 }
 
 function generateMap(a) {
-	(!a)?f=0:0;
-
+	f=0;
 	for(i = 1; i <= wi * he; i++)
 	{
 		if (a)
@@ -202,7 +201,7 @@ function generateMap(a) {
 			var k = d > 3 ? 2 : d > 1 ? 1 : 0;
 			drawBlock(i,m[i] = k);
 		}
-		else if (a == 0)
+		else
 		{
 			if (m[i] > 1 && m[i] < 4)
 				drawBlock(i, m[i] = 1);
@@ -214,7 +213,7 @@ function generateMap(a) {
 			}
 		}
 	}
-	return (!a)?f:0;
+	return f;
 }
 
 function getMinDistance2Border(k)
