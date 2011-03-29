@@ -52,13 +52,13 @@ invertY = {
 };
 
 // arrays to convert vectors to coefficients
-v2x = {
+X = {
 	0:-1,
 	1:1,
 	2:1,
 	3:-1
 };
-v2y = {
+Y = {
 	0:-1,
 	1:-1,
 	2:1,
@@ -139,36 +139,25 @@ function moveUser()
 
 function moveEnemy(t)
 {
-	createNewEnemyVector(t);
-
-	k = v2x[t.v] + v2y[t.v]*W;
-
-	if (enemyCanBeHere(t.k+k, t.t))
-		changeObjectPosition(t, t.k+k);
-
-	checkGameOver(t);
-}
-
-function checkGameOver(t)
-{
-	if (t.k == U.k || M[t.k] == 3)
-		gameOver();
-}
-
-function createNewEnemyVector(t)
-{
 	v = t.v;
-	x = v2x[v];
-	y = v2y[v]*W;
+	y=Y[v]*W;
 
-	if (!enemyCanBeHere(t.k+x, t.t))
+	if (!enemyCanBeHere(t.k+X[v], t.t))
 		t.v = invertX[v];
 
 	if (!enemyCanBeHere(t.k+y, t.t))
 		t.v = invertY[v];
 
-	if (v == t.v && !enemyCanBeHere(t.k+x+y, t.t)) // we need to check if we already changed the vector
+	if (v == t.v && !enemyCanBeHere(t.k+X[v]+y, t.t)) // we need to check if we already changed the vector
 		t.v = invertY[invertX[v]];
+
+	k = X[t.v] + Y[t.v]*W;
+
+	if (enemyCanBeHere(t.k+k, t.t))
+		changeObjectPosition(t, t.k+k);
+
+	if (t.k == U.k || M[t.k] == 3)
+		gameOver();
 }
 
 // draw object at new coordinates and delete it from old coordinates
