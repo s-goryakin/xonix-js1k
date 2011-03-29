@@ -161,7 +161,8 @@ function moveEnemy(t)
 }
 
 // draw object at new coordinates and delete it from old coordinates
-function changeObjectPosition(t, k2)
+//third parameter is GameOver
+function changeObjectPosition(t, k2,go)
 {
 	// Delete old item first
 	k = t.k;
@@ -175,7 +176,7 @@ function changeObjectPosition(t, k2)
 	if (!t.t && M[t.k] == 3 * M[k2])
 	{
 		U.v = 0;
-		fillMap();
+		if(!go)fillMap();
 	}
 
 	// Draw new item
@@ -202,13 +203,13 @@ function generateMap(redraw) {
 	i = W * H + 1;
 	while (i--)
 	{
-		if (redraw)
+		if (redraw==1)
 		{
 			j = getMinDistance2Border(i);
 			k = j > 3 ? 2 : j > 1 ? 1 : 0;
 			drawBlock(i, M[i] = k);
 		}
-		else
+		if(redraw==0)
 		{
 			if (M[i] > 1 && M[i] < 4)
 				drawBlock(i, M[i] = 1);
@@ -219,6 +220,8 @@ function generateMap(redraw) {
 				M[i] = 2;
 			}
 		}
+		if(redraw==2 && M[i]>1 && M[i]<4)
+			drawBlock(i, M[i]=2);
 	}
 	return sea_area;
 }
@@ -238,7 +241,8 @@ function gameOver() {
 	lives--;
 	togglePause();
 	if(lives>0) {
-		changeObjectPosition(U, P);
+		changeObjectPosition(U, P,1);
+		generateMap(2);
 	}
 	else {
 		a[_fs]="red";
