@@ -14,7 +14,7 @@ B=10; // block size
 
 D=Math; // alias
 r=D.random; // alias
-R=D.round; // alias
+//R=D.round; // alias // now simple use ~~
 m=D.min; // alias
 I=parseInt; // alias
 
@@ -106,11 +106,11 @@ function createObjects(type, count)
 	while (i--)
 	{
 		// vectors: 1 - left-up, 2 - right-up, 3 - right-down, 4 - left-down
-		while (M[k = R(r() * W * H)] != type); // getting random coordinates
+		while (M[k = ~~(r() * W * H)] != type); // getting random coordinates
 		E.push({
 			t:type,
 			c:5,
-			v:R(r() * 3), // getting random vector
+			v:~~(r() * 3), // getting random vector
 			k:k
 		});
 	}
