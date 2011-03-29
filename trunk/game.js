@@ -130,7 +130,7 @@ function moveUser()
 		k = U.k + ((v-1) * (v-3) ? (v - 3) * W : v - 2);
 
 		if (M[k] == 3) gameOver();
-		if (M[k])
+		else if (M[k])
 			changeObjectPosition(U, k);
 		else
 			U.v = 0;
@@ -239,12 +239,12 @@ function getMinDistance2Border(index)
 
 function gameOver() {
 	lives--;
-	togglePause();
 	if(lives>0) {
 		changeObjectPosition(U, P,1);
 		generateMap(2);
 	}
 	else {
+		togglePause();
 		a[_fs]="red";
 		a[_fr](0,0,W*B,H*B);
 		a[_fs]="white";
